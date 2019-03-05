@@ -5,6 +5,11 @@
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@section scripts
+{
+	<script src="~/Scripts/Custom/radio_playout.js"></script>
+}
+
 <!-- Enter Radio Playout Modal -->
 <div class="modal fade" id="enter_radio_playout_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
@@ -297,8 +302,8 @@
 				<div class="card-header bg-dark text-light text-center">Schedule</div>
 				<div class="card-body p-0">
 					<div class="row no-gutters schedule_content_header bg-secondary text-light text-center align-items-center">
-						<div class="col-5">Hour Duration - 00:00:00</div>
-						<div class="col-5">Overrun - 00:00:00</div>
+						<div class="col-5">Hour Duration - <span id="schedule_hour_duration">00:00:00</span></div>
+						<div class="col-5" id="schedule_hour_running">Overrun - 00:00:00</div>
 						<div class="col-1"><i class="fas fa-calendar-alt"></i></div>
 						<div class="col-1"><i class="fas fa-home pointer"></i></div>
 					</div>
@@ -321,7 +326,7 @@
 									htmlOutput = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect\" data-audio_id=" + @schedule_item.Audio.AudioId + ">";
 								}
 								@Html.Raw(htmlOutput);
-								<div class="col-2">00:00:00</div>
+								<div class="col-2 schedule_item_time">00:00:00</div>
 								<div class="col-7">
 									<ul class="list-unstyled m-0 text-truncate">
 										<li>@schedule_item.Audio.ArtistName</li>
@@ -330,7 +335,7 @@
 								</div>
 								<div class="col-2">
 									<ul class="list-unstyled m-0">
-										<li>@schedule_item.Audio.AudioDuration</li>
+										<li class="schedule_item_duration">@schedule_item.Audio.AudioDuration</li>
 										<li>IN @schedule_item.Audio.AudioIn</li>
 									</ul>
 								</div>
@@ -345,8 +350,3 @@
 		</div>
 	</div>
 </div>
-
-@section scripts
-{
-	<script src="~/Scripts/Custom/radio_playout.js"></script>
-}

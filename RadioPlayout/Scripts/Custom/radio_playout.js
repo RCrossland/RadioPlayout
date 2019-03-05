@@ -550,7 +550,6 @@ const musicLibrary = {
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 console.log(errorThrown);
-                console.log(jqXHR.responseText);
                 //or you can put jqXHR.responseText somewhere as complete response. Its html.
             }
         })
@@ -584,7 +583,7 @@ const musicLibrary = {
 
 const schedule = {
     settings: {
-
+        scheduleDate: "27 February 2019 01:00"
     },
     init: function () {
         s = schedule.settings;
@@ -605,8 +604,6 @@ const schedule = {
         $("#schedule_content_items_outer").sortable({
             items: ".schedule_content_item:not(.played_track,.current_track,.next_track)",
             update: function (event, ui) {
-                console.log("Item dropped on schedule");
-
                 if ($(ui.item[0]).hasClass("music_library_item")) {
                     radioPlayout.getTrackData($(ui.item[0]).data("audio_id"), function (audio_values) {
                         // Item has come from the music library
@@ -618,7 +615,7 @@ const schedule = {
                         $(ui.item[0]).empty();
 
                         let scheduleItemHTML =
-                            '<div class="col-2">00:00:00</div>' +
+                            '<div class="col-2 schedule_item_time">00:00:00</div>' +
                             '<div class="col-7">' +
                             '<ul class="list-unstyled m-0 text-truncate">' +
                             '<li>' + audio_values.ArtistName + '</li>' +
@@ -627,7 +624,7 @@ const schedule = {
                             '</div>' +
                             '<div class="col-2">' +
                             '<ul class="list-unstyled m-0">' +
-                            '<li>' + audio_values.AudioDuration + '</li>' +
+                            '<li class="schedule_item_duration">' + audio_values.AudioDuration + '</li>' +
                             '<li>IN ' + audio_values.AudioIn + '</li>' +
                             '</ul>' +
                             '</div>' +
@@ -639,7 +636,12 @@ const schedule = {
                         $(".schedule_content_progress_indicator").click(function (e) {
                             schedule.progressIndicatorChange($(this));
                         });
+
+                        schedule.calculateScheduleTimes();
                     });
+                }
+                else {
+                    schedule.calculateScheduleTimes();
                 }
             }
         });
@@ -651,6 +653,43 @@ const schedule = {
         }
         else {
             $(selectedElement).children().removeClass("fa-pause").addClass("fa-play");
+        }
+    },
+    calculateScheduleTimes: function () {
+        let currentTime = 0;
+
+        // Set the time each item is predicted to be played at
+        $(".schedule_content_item ").each(function (index) {
+            if ($(this).find(".schedule_item_duration")[0].innerHTML.match("^\\d+$")) {
+                currentTime = parseInt(currentTime) + parseInt($(this).find(".schedule_item_duration")[0].innerHTML);
+
+                let date = new Date(schedule.settings.scheduleDate);
+                date.setSeconds(currentTime);
+
+                $(this).find(".schedule_item_time")[0].innerHTML = date.toISOString().substr(11, 8);
+            }
+        });
+
+        // Set the hour duration time
+        let date = new Date(null);
+        date.setSeconds(currentTime);
+        $("#schedule_hour_duration")[0].innerHTML = date.toISOString().substr(11, 8);
+
+        // Set whether the hour will be over/under run
+        if (currentTime == 3600) {
+            $("#schedule_hour_running")[0].innerHTML = "Overrun: 00:00:00";
+        }
+        else if (currentTime < 3600) {
+            let date = new Date(null);
+            date.setSeconds(3600 - currentTime);
+
+            $("#schedule_hour_running")[0].innerHTML = "Underrun: " + date.toISOString().substr(11, 8);
+        }
+        else {
+            let date = new Date(null);
+            date.setSeconds(currentTime - 3600);
+
+            $("#schedule_hour_running")[0].innerHTML = "Overrun: " + date.toISOString().substr(11, 8);
         }
     }
 };
@@ -689,4 +728,6 @@ $(document).ready(function () {
     schedule.init();
     musicLibrary.init();
     autoDJSwitch.init();
+
+    schedule.calculateScheduleTimes();
 });
