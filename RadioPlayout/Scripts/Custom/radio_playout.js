@@ -659,6 +659,20 @@ const schedule = {
         else {
             $(selectedElement).children().removeClass("fa-pause").addClass("fa-play");
         }
+
+        // Update the database to reflect the change
+        $.ajax({
+            url: $("#schedule_content_items_outer").data("update-indicator-url"),
+            type: "POST",
+            data: { "scheduleItemId": $(selectedElement).data("schedule_item_id") },
+            success: function (data) {
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // TODO: Add error messages when the schedule can't be loaded
+                //or you can put jqXHR.responseText somewhere as complete response. Its html.
+            }
+        })
     },
     getScheduleItems: function (scheduleId) {
         $.ajax({
@@ -669,6 +683,8 @@ const schedule = {
                 $("#schedule_content_items_outer").empty();
 
                 $.each(scheduleItems, function (index, value) {
+                    console.log(value)
+
                     let scheduleItemsHTML = "";
                     if (index == 0) {
                         scheduleItemsHTML = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect current_track\" data-audio_id=" + value.Audio.AudioId + " data-schedule_id=" + value.ScheduleItemsId + ">";
@@ -692,12 +708,17 @@ const schedule = {
                                 '<li class="schedule_item_duration">' + value.Audio.AudioDuration + '</li>' +
                                 '<li>IN ' + value.Audio.AudioIn + '</li>' +
                             '</ul>' +
-                        '</div>' +
-                        '<div class="col-1 schedule_content_progress_indicator"><i class="fas fa-play pointer"></i></div>' +
                         '</div>';
+                    if (value.PlayNextItem == 0) {
+                        scheduleItemsHTML = scheduleItemsHTML + '<div class="col-1 schedule_content_progress_indicator" data-schedule_item_id=' + value.ScheduleItemsId + '><i class="fas fa-pause pointer"></i></div >';
+                        } else {
+                        scheduleItemsHTML = scheduleItemsHTML + '<div class="col-1 schedule_content_progress_indicator" data-schedule_item_id=' + value.ScheduleItemsId + '><i class="fas fa-play pointer"></i></div >';
+                        }
+                        scheduleItemsHTML = scheduleItemsHTML + '</div>';
                     $("#schedule_content_items_outer").append(scheduleItemsHTML);
                 });
 
+                schedule.bindUIAction();
                 schedule.calculateScheduleTimes();
             },
             error: function (jqXHR, textStatus, errorThrown) {

@@ -247,6 +247,37 @@ namespace RadioPlayout.Controllers
 		}
 
 		[HttpPost]
+		public ActionResult UpdatePlayNextItemIndicator(string scheduleItemId)
+		{
+			// If the scheduleItemId exists conver it to an integer
+			int scheduleItemIdInt = 0;
+			if (!String.IsNullOrWhiteSpace(scheduleItemId))
+			{
+				scheduleItemIdInt = Int32.Parse(scheduleItemId);
+			}
+			// Find the schedule item with the inputted scheduleItemId
+			var scheduleItems = _db.ScheduleItems.Where(r => r.ScheduleItemsId.Equals(scheduleItemIdInt));
+
+			foreach(ScheduleItems scheduleItem in scheduleItems)
+			{
+				// If the PlayNextItem is current set to 0 set it to 1 and vice versa
+				if(scheduleItem.PlayNextItem == 0)
+				{
+					scheduleItem.PlayNextItem = 1;
+				}
+				else
+				{
+					scheduleItem.PlayNextItem = 0;
+				}
+			}
+
+			// Save the database changes
+			_db.SaveChanges();
+
+			return Json("", JsonRequestBehavior.AllowGet);
+		}
+
+		[HttpPost]
 		public ActionResult GetTrackInfo(string audioId)
 		{
 			int audioIdInt = 0;

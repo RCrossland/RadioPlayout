@@ -12,6 +12,8 @@ namespace RadioPlayout.Models
 
 		public int OrderIndex { get; set; }
 
+		public int PlayNextItem { get; set; }
+
 		// Foreign key
 		public virtual Schedule Schedule { get; set; }
 		// Foreign key
