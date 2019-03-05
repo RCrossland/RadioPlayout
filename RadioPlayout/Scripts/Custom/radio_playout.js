@@ -143,7 +143,7 @@ const radioPlayout = {
     },
     getTrackData: function (audioId, callbackFunction) {
         $.ajax({
-            url: $("#schedule_content_items_outer").data("request-url"),
+            url: $("#music_catalogue_outer").data("request-url"),
             type: "POST",
             data: { "audioId": audioId },
             success: function (result) {
@@ -583,6 +583,7 @@ const musicLibrary = {
 
 const schedule = {
     settings: {
+        schedule: "1",
         scheduleDate: "27 February 2019 01:00"
     },
     init: function () {
@@ -638,10 +639,14 @@ const schedule = {
                         });
 
                         schedule.calculateScheduleTimes();
+
+                        schedule.addNewScheduleItem(schedule.settings.schedule, ui.item.data("audio_id"), ui.item.index() + 1);
                     });
                 }
                 else {
                     schedule.calculateScheduleTimes();
+
+                    schedule.updateScheduleItemPosition(ui.item.data("schedule_id"), ui.item.index() + 1);
                 }
             }
         });
@@ -654,6 +659,86 @@ const schedule = {
         else {
             $(selectedElement).children().removeClass("fa-pause").addClass("fa-play");
         }
+    },
+    getScheduleItems: function (scheduleId) {
+        $.ajax({
+            url: $("#schedule_content_items_outer").data("request-url"),
+            type: "POST",
+            data: { "scheduleId": scheduleId },
+            success: function (scheduleItems) {
+                $("#schedule_content_items_outer").empty();
+
+                $.each(scheduleItems, function (index, value) {
+                    let scheduleItemsHTML = "";
+                    if (index == 0) {
+                        scheduleItemsHTML = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect current_track\" data-audio_id=" + value.Audio.AudioId + " data-schedule_id=" + value.ScheduleItemsId + ">";
+                    }
+                    else if (index == 1) {
+                        scheduleItemsHTML = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect next_track\" data-audio_id=" + value.Audio.AudioId + " data-schedule_id=" + value.ScheduleItemsId + ">"
+                    }
+                    else {
+                        scheduleItemsHTML = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect\" data-audio_id=" + value.Audio.AudioId + " data-schedule_id=" + value.ScheduleItemsId + ">";
+                    }
+
+                    scheduleItemsHTML = scheduleItemsHTML + '<div class="col-2 schedule_item_time">00:00:00</div>' +
+                        '<div class="col-7">' +
+                            '<ul class="list-unstyled m-0 text-truncate">' +
+                                '<li>' + value.Audio.ArtistName + '</li>' +
+                                '<li>' + value.Audio.AudioTitle + '</li>' +
+                            '</ul>' +
+                        '</div>' +
+                        '<div class="col-2">' +
+                            '<ul class="list-unstyled m-0">' +
+                                '<li class="schedule_item_duration">' + value.Audio.AudioDuration + '</li>' +
+                                '<li>IN ' + value.Audio.AudioIn + '</li>' +
+                            '</ul>' +
+                        '</div>' +
+                        '<div class="col-1 schedule_content_progress_indicator"><i class="fas fa-play pointer"></i></div>' +
+                        '</div>';
+                    $("#schedule_content_items_outer").append(scheduleItemsHTML);
+                });
+
+                schedule.calculateScheduleTimes();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // TODO: Add error messages when the schedule can't be loaded
+                //or you can put jqXHR.responseText somewhere as complete response. Its html.
+            }
+        });
+    },
+    updateScheduleItemPosition: function (scheduleItemId, newItemOrderIndex) {
+        $.ajax({
+            url: $("#schedule_content_items_outer").data("update-url"),
+            type: "POST",
+            data: {
+                "scheduleId": schedule.settings.schedule,
+                "scheduleItemId": scheduleItemId,
+                "newItemOrderIndex": newItemOrderIndex
+            },
+            success: function (data) {
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                //or you can put jqXHR.responseText somewhere as complete response. Its html.
+            }
+        });
+    },
+    addNewScheduleItem: function (scheduleId, audioId, orderIndex) {
+        $.ajax({
+            url: $("#schedule_content_items_outer").data("new-url"),
+            method: "POST",
+            data: {
+                "scheduleId": scheduleId,
+                "audioId": audioId,
+                "orderIndex": orderIndex
+            },
+            success: function (data) {
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR.responseText);
+
+                //or you can put jqXHR.responseText somewhere as complete response. Its html.
+            }
+        })
     },
     calculateScheduleTimes: function () {
         let currentTime = 0;
@@ -729,5 +814,5 @@ $(document).ready(function () {
     musicLibrary.init();
     autoDJSwitch.init();
 
-    schedule.calculateScheduleTimes();
+    schedule.getScheduleItems(1);
 });

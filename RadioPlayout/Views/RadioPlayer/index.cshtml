@@ -280,12 +280,12 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-12 p-0 radio_player_card_outer">
+			<div class="col-12 p-0 radio_player_card_outer" id="music_catalogue_outer" data-request-url="@Url.Action("GetTrackInfo")">
 				<div class="card h-100">
 					<div class="card-header bg-dark text-light">
 						<div class="row no-gutters">
 							<div class="col-2"></div>
-							<div class="col-8 text-center">Music Library</div>
+							<div class="col-8 text-center">Music Catalogue</div>
 							<div class="col-2 text-right">
 								<i class="fas fa-filter pointer" id="musicLibraryBtn"></i>
 							</div>
@@ -308,41 +308,7 @@
 						<div class="col-1"><i class="fas fa-home pointer"></i></div>
 					</div>
 					<div class="row no-gutters radio_player_audio_info">
-						<div class="col-12 pre-scrollable" id="schedule_content_items_outer" data-request-url="@Url.Action("GetTrackInfo")">
-							@{ int i = 0; }
-							@foreach (ScheduleItems schedule_item in Model.ScheduleItems)
-							{
-								string htmlOutput = "";
-								if (i == 0)
-								{
-									htmlOutput = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect current_track\" data-audio_id=" + @schedule_item.Audio.AudioId + ">";
-								}
-								else if (i == 1)
-								{
-									htmlOutput = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect next_track\" data-audio_id=" + @schedule_item.Audio.AudioId + ">";
-								}
-								else
-								{
-									htmlOutput = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect\" data-audio_id=" + @schedule_item.Audio.AudioId + ">";
-								}
-								@Html.Raw(htmlOutput);
-								<div class="col-2 schedule_item_time">00:00:00</div>
-								<div class="col-7">
-									<ul class="list-unstyled m-0 text-truncate">
-										<li>@schedule_item.Audio.ArtistName</li>
-										<li>@schedule_item.Audio.AudioTitle</li>
-									</ul>
-								</div>
-								<div class="col-2">
-									<ul class="list-unstyled m-0">
-										<li class="schedule_item_duration">@schedule_item.Audio.AudioDuration</li>
-										<li>IN @schedule_item.Audio.AudioIn</li>
-									</ul>
-								</div>
-								<div class="col-1 schedule_content_progress_indicator"><i class="fas fa-play pointer"></i></div>
-								@Html.Raw("</div>")
-								i++;
-							}
+						<div class="col-12 pre-scrollable" id="schedule_content_items_outer" data-request-url="@Url.Action("GetScheduleItemsData")" data-update-url="@Url.Action("UpdateScheduleItemOrderIndex")" data-new-url="@Url.Action("AddNewScheduleItem")">
 						</div>
 					</div>
 				</div>
