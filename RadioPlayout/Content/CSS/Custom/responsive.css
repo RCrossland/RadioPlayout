@@ -1,0 +1,38 @@
+﻿/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+	.radio_player_card_outer {
+		height: 15em;
+	}
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+	.left_navigation {
+		float: left;
+		height: 100%;
+		width: 15em;
+	}
+
+	.navigation_toggler {
+		display: none;
+	}
+
+	.navigation_outer {
+		display: block;
+	}
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+	.radio_player_card_outer {
+		height: 13em;
+	}
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+}

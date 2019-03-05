@@ -1,0 +1,352 @@
+﻿@using RadioPlayout.Models;
+@model dynamic
+@{
+	ViewBag.Title = "index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Enter Radio Playout Modal -->
+<div class="modal fade" id="enter_radio_playout_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalCenterTitle">Radio Playout</h5>
+			</div>
+			<div class="modal-body">
+				You have no upcoming shows.
+			</div>
+			<div class="modal-footer">
+				<button type="button" id="enter_radio_playout_button" class="btn btn-dark">Enter Radio Playout</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Music Library Modal -->
+<div class="modal fade" id="music_library_modal" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Music Library Filter</h5>
+				<div class="text-right text-secondary" id="music_library_results_returned"></div>
+			</div>
+			<div class="modal-body">
+				<form method="POST" id="filter_music_library_form">
+					<div class="form-row">
+						<div class="col-6">
+							<div class="form-group">
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<div class="input-group-text"><i class="fas fa-search"></i></div>
+									</div>
+									<input type="text" class="form-control" name="audioSearch" placeholder="Search for an artist or song title">
+								</div>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="form-group">
+								<select name="audioType" class="form-control">
+									<option selected disabled>Track Type</option>
+									<option value="1">Song</option>
+									<option value="2">Jingle</option>
+									<option value="3">Bed</option>
+									<option value="4">FX</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="col-6">
+							<div class="">Time Selection</div>
+							<div class="form-row">
+								<div class="col-6">
+									<input type="text" class="form-control" name="audioMinDuration" placeholder="Min time">
+								</div>
+								<div class="col-6">
+									<input type="text" class="form-control" name="audioMaxDuration" placeholder="Max time">
+								</div>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="">Select Years</div>
+							<div class="form-group">
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" id="audioYear60" name="audioYear" value="60">
+									<label class="form-check-label" for="audioYear60">60s</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" id="audioYear70" name="audioYear" value="70">
+									<label class="form-check-label" for="audioYear70">70s</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" id="audioYear80" name="audioYear" value="80">
+									<label class="form-check-label" for="audioYear80">80s</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" id="audioYear90" name="audioYear" value="90">
+									<label class="form-check-label" for="audioYear90">90s</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" id="audioYear00" name="audioYear" value="00">
+									<label class="form-check-label" for="audioYear00">00s</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" id="audioYear10" name="audioYear" value="10">
+									<label class="form-check-label" for="audioYear10">10s</label>
+								</div>
+							</div>
+						</div>
+					</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+				<input type="reset" id="filter_music_library_reset_btn" class="btn btn-secondary" value="Reset Filter">
+				<input type="submit" id="filter_music_library_submit_btn" class="btn btn-dark" value="Filter Search">
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="container-fluid">
+	<div class="row no-gutters">
+		<!-- Radio Players 1/2 -->
+		<div class="col-12 col-lg-4">
+			<div class="col-12 p-0 radio_player_card_outer radio_player_outer" name="radio_player_1">
+				<div class="card h-100">
+					<div class="card-header bg-dark text-white">Radio Player 1</div>
+					<div class="card-body pt-2 p-0 overflow-hidden h-100">
+						<div class="row no-gutters">
+							<audio class="d-none" id="radio_player_1_audio"></audio>
+							<div class="col-5">
+								<div class="row no-gutters d-flex justify-content-center">
+									<div class="col-6">
+										<div class="radio_player_image">
+											<img src="http://jackiehawkins.com/wp-content/uploads/2014/03/Screen-Shot-2014-03-04-at-15.54.39.png" alt="">
+										</div>
+									</div>
+								</div>
+								<div class="radio_player_playback_options pt-2">
+									<div class="row no-gutters d-flex justify-content-center">
+										<div class="col-2 col-sm-3 mr-1 border border-dark text-center pointer radio_player_playback_button no_select" id="radio_player_1_eject">
+											<i class="fas fa-eject"></i>
+										</div>
+										<div class="col-2 col-sm-3 mr-1 border border-dark text-center pointer radio_player_playback_button no_select" id="radio_player_1_pause">
+											<i class="fas fa-pause"></i>
+										</div>
+										<div class="col-2 col-sm-3 mr-1 border border-dark text-center pointer radio_player_playback_button no_select" id="radio_player_1_play">
+											<i class="fas fa-play"></i>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-5">
+								<div class="text-center">
+									<ul class="list-unstyled">
+										<li class="text-truncate radio_player_audio_info" id="radio_player_1_artist_name">Player Waiting For Audio</li>
+										<li class="text-truncate radio_player_audio_info" id="radio_player_1_song_title"><br></li>
+									</ul>
+
+									<ul class="list-unstyled">
+										<li class="radio_player_audio_info">Time Remaining:</li>
+										<li class="radio_player_audio_info" id="radio_player_1_duration">00:00:00</li>
+									</ul>
+
+									<div class="progress" id="radio_player_1_duration_bar">
+										<div class="progress-bar" role="progressbar" style="width: 0%;">00:00</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-2 mt-2 d-flex justify-content-center">
+								<div class="row no-gutters">
+									<div class="col-6">
+										<div class="slider_wrapper">
+											<input id="radio_player_1_volume_slider" type="range" min="0" max="100" value="75" step="5">
+										</div>
+									</div>
+									<div class="col-6" style="height: 7.5em">
+										<div class="progress progress_bar_vertical" id="radio_player_1_volume_level">
+											<div class="progress_bar bg-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="height: 0%;"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-12 p-0 radio_player_card_outer radio_player_outer" name="radio_player_2">
+				<div class="card h-100">
+					<div class="card-header bg-dark text-white">Radio Player 2</div>
+					<div class="card-body pt-2 p-0 overflow-hidden h-100">
+						<div class="row no-gutters">
+							<audio class="d-none" id="radio_player_2_audio"></audio>
+							<div class="col-5">
+								<div class="row no-gutters d-flex justify-content-center">
+									<div class="col-6">
+										<div class="radio_player_image">
+											<img src="http://jackiehawkins.com/wp-content/uploads/2014/03/Screen-Shot-2014-03-04-at-15.54.39.png" alt="">
+										</div>
+									</div>
+								</div>
+								<div class="radio_player_playback_options pt-2">
+									<div class="row no-gutters d-flex justify-content-center">
+										<div class="col-2 col-sm-3 mr-1 border border-dark text-center pointer radio_player_playback_button no_select" id="radio_player_2_eject">
+											<i class="fas fa-eject"></i>
+										</div>
+										<div class="col-2 col-sm-3 mr-1 border border-dark text-center pointer radio_player_playback_button no_select" id="radio_player_2_pause">
+											<i class="fas fa-pause"></i>
+										</div>
+										<div class="col-2 col-sm-3 mr-1 border border-dark text-center pointer radio_player_playback_button no_select" id="radio_player_2_play">
+											<i class="fas fa-play"></i>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-5">
+								<div class="text-center">
+									<ul class="list-unstyled">
+										<li class="text-truncate radio_player_audio_info" id="radio_player_2_artist_name">Player Waiting For Audio</li>
+										<li class="text-truncate radio_player_audio_info" id="radio_player_2_song_title"><br></li>
+									</ul>
+
+									<ul class="list-unstyled">
+										<li class="radio_player_audio_info">Time Remaining:</li>
+										<li class="radio_player_audio_info" id="radio_player_2_duration">00:00:00</li>
+									</ul>
+
+									<div class="progress" id="radio_player_2_duration_bar">
+										<div class="progress-bar" role="progressbar" style="width: 0%;">00:00</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-2 mt-2 d-flex justify-content-center">
+								<div class="row no-gutters">
+									<div class="col-6">
+										<div class="slider_wrapper">
+											<input id="radio_player_2_volume_slider" type="range" min="0" max="100" value="75" step="5">
+										</div>
+									</div>
+									<div class="col-6" style="height: 7.5em">
+										<div class="progress progress_bar_vertical" id="radio_player_2_volume_level">
+											<div class="progress_bar bg-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="height: 0%;"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Microphone Push To Talk / Music Library -->
+		<div class="col-12 col-lg-4">
+			<div class="col-12 p-0 radio_player_card_outer">
+				<div class="card h-100">
+					<div class="card-header bg-dark text-light text-center">
+						<div class="row no-gutters">
+							<div class="col-2"></div>
+							<div class="col-8 text-center">Microphone - Push To Talk</div>
+							<div class="col-2 text-right">
+								<i class="fas fa-cog"></i>
+							</div>
+						</div>
+					</div>
+					<div class="card-body p-0 overflow-hidden">
+						<div class="row no-gutters justify-content-center">
+							<div class="col-6 col-sm-6 col-xl-5 align-self-center mr-2">
+								<span class="push_to_talk_button pointer">Push To Talk</span>
+							</div>
+							<div class="col-2 mt-2 d-flex justify-content-center">
+								<div class="row no-gutters">
+									<div class="col-6">
+										<div class="slider_wrapper">
+											<input type="range" min="0" max="11" value="7" step="1">
+										</div>
+									</div>
+									<div class="col-6" style="height: 7.5em">
+										<div class="progress progress_bar_vertical">
+											<div class="progress-bar bg-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="height: 75%;"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-12 p-0 radio_player_card_outer">
+				<div class="card h-100">
+					<div class="card-header bg-dark text-light">
+						<div class="row no-gutters">
+							<div class="col-2"></div>
+							<div class="col-8 text-center">Music Library</div>
+							<div class="col-2 text-right">
+								<i class="fas fa-filter pointer" id="musicLibraryBtn"></i>
+							</div>
+						</div>
+					</div>
+					<div class="card-body p-0 pre-scrollable noSelect radio_player_audio_info" id="music_catalogue_items_outer" data-request-url="@Url.Action("FilterAudioCatalogue")">
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Schedule -->
+		<div class="col-12 col-lg-4 p-0 schedule_content_outer">
+			<div class="card">
+				<div class="card-header bg-dark text-light text-center">Schedule</div>
+				<div class="card-body p-0">
+					<div class="row no-gutters schedule_content_header bg-secondary text-light text-center align-items-center">
+						<div class="col-5">Hour Duration - 00:00:00</div>
+						<div class="col-5">Overrun - 00:00:00</div>
+						<div class="col-1"><i class="fas fa-calendar-alt"></i></div>
+						<div class="col-1"><i class="fas fa-home pointer"></i></div>
+					</div>
+					<div class="row no-gutters radio_player_audio_info">
+						<div class="col-12 pre-scrollable" id="schedule_content_items_outer" data-request-url="@Url.Action("GetTrackInfo")">
+							@{ int i = 0; }
+							@foreach (ScheduleItems schedule_item in Model.ScheduleItems)
+							{
+								string htmlOutput = "";
+								if (i == 0)
+								{
+									htmlOutput = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect current_track\" data-audio_id=" + @schedule_item.Audio.AudioId + ">";
+								}
+								else if (i == 1)
+								{
+									htmlOutput = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect next_track\" data-audio_id=" + @schedule_item.Audio.AudioId + ">";
+								}
+								else
+								{
+									htmlOutput = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect\" data-audio_id=" + @schedule_item.Audio.AudioId + ">";
+								}
+								@Html.Raw(htmlOutput);
+								<div class="col-2">00:00:00</div>
+								<div class="col-7">
+									<ul class="list-unstyled m-0 text-truncate">
+										<li>@schedule_item.Audio.ArtistName</li>
+										<li>@schedule_item.Audio.AudioTitle</li>
+									</ul>
+								</div>
+								<div class="col-2">
+									<ul class="list-unstyled m-0">
+										<li>@schedule_item.Audio.AudioDuration</li>
+										<li>IN @schedule_item.Audio.AudioIn</li>
+									</ul>
+								</div>
+								<div class="col-1 schedule_content_progress_indicator"><i class="fas fa-play pointer"></i></div>
+								@Html.Raw("</div>")
+								i++;
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section scripts
+{
+	<script src="~/Scripts/Custom/radio_playout.js"></script>
+}

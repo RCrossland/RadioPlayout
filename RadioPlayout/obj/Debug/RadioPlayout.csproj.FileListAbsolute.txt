@@ -73,8 +73,14 @@ C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\bin\Antlr3.Runtime.pdb
 C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\bin\System.Diagnostics.DiagnosticSource.xml
 C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\bin\Microsoft.AspNet.TelemetryCorrelation.xml
 C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
-C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.csprojAssemblyReference.cache
 C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.csproj.CoreCompileInputs.cache
 C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.csproj.CopyComplete
 C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.dll
 C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.pdb
+C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout\bin\EntityFramework.dll
+C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout\bin\EntityFramework.SqlServer.dll
+C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout\bin\EntityFramework.xml
+C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout\bin\EntityFramework.SqlServer.xml
+C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.Migrations.InitialCreate.resources
+C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.csproj.GenerateResource.cache
+C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.csprojAssemblyReference.cache

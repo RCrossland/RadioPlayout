@@ -1,42 +1,113 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
-</head>
-<body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
-    </div>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Radio Playout - @ViewBag.Title</title>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
-</body>
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+	<!-- Custom CSS -->
+	@Styles.Render("~/Content/css")
+
+	<!-- JQuery Scripts -->
+	<script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
+
+	<!-- Bootstrap Scripts -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+	<!-- Custom Scripts -->
+	@Scripts.Render("~/Bundles/modernizr")
+	@Scripts.Render("~/bundles/scripts")
+	@RenderSection("scripts", required: false)
+</head>
+	<body>
+		<!-- Left Navigation Panel -->
+		<div class="left_navigation">
+			<div class="container-fluid">
+				<div class="left_navigation_branding">
+					<a class="navbar-brand left_navigation_logo float-left" href="#">
+						Click My Radio
+					</a>
+					<i class="fas fa-bars navigation_toggler pointer"></i>
+				</div>
+
+				<hr class="navbar-divider">
+
+				<div class="navigation_outer">
+					<div class="left_navigation_user d-flex align-items-center">
+						<div class="left_navigation_user_image float-left">
+							<img src="http://icons.iconarchive.com/icons/paomedia/small-n-flat/512/user-male-icon.png" alt="">
+						</div>
+						<div class="left_navigation_user_details float-right">
+							Welcome, <br>
+							Greg James
+						</div>
+					</div>
+
+					<hr class="navbar-divider">
+
+					<ul class="left_navigation_list navbar-nav">
+						<li class="navbar-item left_navigation_list_item">
+							<a href="#" class="left_navigation_list_item_link left_navigation_list_item_active">
+								<i class="fas fa-tachometer-alt left_navigation_list_item_icon"></i> Dashboard
+							</a>
+						</li>
+						<li class="navbar-item left_navigation_list_item">
+							<a href="#" class="left_navigation_list_item_link">
+								<i class="fas fa-calendar-alt left_navigation_list_item_icon"></i> Schedule
+							</a>
+						</li>
+						<li class="navbar-item left_navigation_list_item">
+							<a href="#" class="left_navigation_list_item_link">
+								<i class="fas fa-music left_navigation_list_item_icon"></i> Music Catalogue
+							</a>
+						</li>
+						<li class="navbar-item left_navigation_list_item">
+							<a href="#" class="left_navigation_list_item_link">
+								<i class="fas fa-microphone left_navigation_list_item_icon"></i> Radio Playout
+							</a>
+						</li>
+						<li class="navbar-item left_navigation_list_item">
+							<a href="#" class="left_navigation_list_item_link">
+								<i class="fas fa-user left_navigation_list_item_icon"></i> My Account
+							</a>
+						</li>
+					</ul>
+
+					<hr class="navbar-divider">
+				</div>
+			</div>
+		</div>
+
+		<!-- Top Navigation Panel -->
+		<div class="top_navigation">
+			<div class="top_navigation_content float-right d-flex align-items-center">
+				<div class="top_navigation_switch_outer">
+					<i class="fas fa-toggle-on auto_dj_switch pointer fa-rotate-180"></i> <span class="auto_dj_switch_text">Auto DJ</span>
+				</div>
+
+				<div class="vl float-left"></div>
+
+				<div class="top_navigation_date float-right">
+					<ul class="top_navigation_date_list list-unstyled text-white">
+						<li id="date_ref"></li>
+						<li id="time_ref"></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<!-- Main Content -->
+		<div class="main_content mt-2">
+			@RenderBody()
+		</div>
+	</body>
 </html>
