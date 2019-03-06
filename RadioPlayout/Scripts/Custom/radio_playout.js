@@ -666,7 +666,6 @@ const schedule = {
             type: "POST",
             data: { "scheduleItemId": $(selectedElement).data("schedule_item_id") },
             success: function (data) {
-
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 // TODO: Add error messages when the schedule can't be loaded
@@ -683,8 +682,6 @@ const schedule = {
                 $("#schedule_content_items_outer").empty();
 
                 $.each(scheduleItems, function (index, value) {
-                    console.log(value)
-
                     let scheduleItemsHTML = "";
                     if (index == 0) {
                         scheduleItemsHTML = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect current_track\" data-audio_id=" + value.Audio.AudioId + " data-schedule_id=" + value.ScheduleItemsId + ">";
@@ -755,8 +752,6 @@ const schedule = {
             success: function (data) {
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                console.log(jqXHR.responseText);
-
                 //or you can put jqXHR.responseText somewhere as complete response. Its html.
             }
         })

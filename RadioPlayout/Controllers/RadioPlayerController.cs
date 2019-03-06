@@ -26,6 +26,11 @@ namespace RadioPlayout.Controllers
 			return View(model);
         }
 		
+		/// <summary>
+		/// Get the ScheduleItems from the ScheduleItems database
+		/// </summary>
+		/// <param name="scheduleId">The ScheduleId to search for</param>
+		/// <returns></returns>
 		[HttpPost]
 		public ActionResult GetScheduleItemsData(string scheduleId)
 		{
@@ -42,6 +47,13 @@ namespace RadioPlayout.Controllers
 			return Json(scheduleItems, JsonRequestBehavior.AllowGet);
 		}
 
+		/// <summary>
+		/// Update the OrderIndex of an item in the ScheduleItems database
+		/// </summary>
+		/// <param name="scheduleId">The schedule the ScheduleItem corresponds to</param>
+		/// <param name="scheduleItemId">The ScheduleItem that needs a new OrderIndex</param>
+		/// <param name="newItemOrderIndex">The new OrderIndex for the ScheduleItem</param>
+		/// <returns></returns>
 		[HttpPost]
 		public ActionResult UpdateScheduleItemOrderIndex(string scheduleId, string scheduleItemId, string newItemOrderIndex)
 		{
@@ -149,6 +161,13 @@ namespace RadioPlayout.Controllers
 			return Json("", JsonRequestBehavior.AllowGet);
 		}
 
+		/// <summary>
+		/// To add a new item to the ScheduleItems database
+		/// </summary>
+		/// <param name="scheduleId">The scheduleId that the schedule item corresponds to</param>
+		/// <param name="audioId">The audioId that the scheudle item corresponds to</param>
+		/// <param name="orderIndex">The order index that the new schedule item should have</param>
+		/// <returns></returns>
 		[HttpPost]
 		public ActionResult AddNewScheduleItem(string scheduleId, string audioId, string orderIndex)
 		{
@@ -209,33 +228,44 @@ namespace RadioPlayout.Controllers
 			return Json("", JsonRequestBehavior.AllowGet);
 		}
 
+		/// <summary>
+		/// Filter the Audio database based on inputs from the user
+		/// </summary>
+		/// <param name="audioSearch">An artist name to search for. E.g. "Olly Murs"</param>
+		/// <param name="audioType">An audio type to search for. E.g "Jingle"</param>
+		/// <param name="audioMinDuration">The minimum seconds of a song duration to search for. E.g. "100"</param>
+		/// <param name="audioMaxDuration">The maximum seconds of a song duration to search for. E.g. "500"</param>
+		/// <param name="audioYear">The audio year to search for. E.g. "90s"</param>
+		/// <returns></returns>
 		[HttpPost]
 		public ActionResult FilterAudioCatalogue(string audioSearch, string audioType, string audioMinDuration, string audioMaxDuration, string audioYear)
 		{
+			// Check audioType has a value and convert it to an integer
 			int audioTypeInt = 0;
 			if (!String.IsNullOrWhiteSpace(audioType))
 			{
 				audioTypeInt = Int32.Parse(audioType);
 			}
-
+			// Check audioMinDuration has a value and convert it to an integer
 			int audioMinDurationInt = 0;
 			if (!String.IsNullOrWhiteSpace(audioMinDuration))
 			{
 				audioMinDurationInt = Int32.Parse(audioMinDuration);
 			}
-
+			// Check audioMaxDuration has a value and convert it to an integer
 			int audioMaxDurationInt = 0;
 			if (!String.IsNullOrWhiteSpace(audioMaxDuration))
 			{
 				audioMaxDurationInt = Int32.Parse(audioMaxDuration);
 			}
-
+			// Check audioYear has a value and convert it to an integer
 			int audioYearInt = 0;
 			if (!String.IsNullOrWhiteSpace(audioYear))
 			{
 				audioYearInt = Int32.Parse(audioYear);
 			}
 
+			// Filter the Audio DB based on the filter values supplied by the user
 			var audio = _db.Audio
 						.Where(r => audioSearch == null || r.ArtistName.StartsWith(audioSearch))
 						.Where(r => audioTypeInt == 0 || r.AudioType.AudioTypeId.Equals(audioTypeInt))
@@ -246,10 +276,15 @@ namespace RadioPlayout.Controllers
 			return Json(audio, JsonRequestBehavior.AllowGet);
 		}
 
+		/// <summary>
+		/// Update the PlayNextItem indicator in the audio database.
+		/// </summary>
+		/// <param name="scheduleItemId">The ScheduleItemId that the PlayNextIndicator needs to be updated</param>
+		/// <returns></returns>
 		[HttpPost]
 		public ActionResult UpdatePlayNextItemIndicator(string scheduleItemId)
 		{
-			// If the scheduleItemId exists conver it to an integer
+			// If the scheduleItemId exists convert it to an integer
 			int scheduleItemIdInt = 0;
 			if (!String.IsNullOrWhiteSpace(scheduleItemId))
 			{
@@ -276,16 +311,23 @@ namespace RadioPlayout.Controllers
 
 			return Json("", JsonRequestBehavior.AllowGet);
 		}
-
+		
+		/// <summary>
+		/// Get the track info from the Audio DB based on an AudioId
+		/// </summary>
+		/// <param name="audioId">The AudioId of the audio item from the database</param>
+		/// <returns>A JSON object with the Audio data</returns>
 		[HttpPost]
 		public ActionResult GetTrackInfo(string audioId)
 		{
+			// Check whether the audioId has a value and convert it to an integer
 			int audioIdInt = 0;
 			if(audioId != null)
 			{
 				audioIdInt = Int32.Parse(audioId.Trim());
 			}
 
+			// Search the Audio DB for the audio item based on the audioId
 			var audio = _db.Audio.Where(r => r.AudioId.Equals(audioIdInt));
 
 			return Json(audio, JsonRequestBehavior.AllowGet);

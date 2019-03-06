@@ -40,7 +40,7 @@ namespace RadioPlayout.Migrations
 				new Models.Audio {
 					ArtistName = "Olly Murs",
 					AudioTitle = "Excuses",
-					AudioLocation = "C:/Users/Rob/Desktop/songs/Olly Murs - Excuses.wav",
+					AudioLocation = "/Content/Audio/Olly Murs - Excuses.wav",
 					AudioDuration = 246,
 					AudioIn = 10,
 					AudioOut = 5,
@@ -50,7 +50,7 @@ namespace RadioPlayout.Migrations
 				{
 					ArtistName = "Adele",
 					AudioTitle = "Hello",
-					AudioLocation = "C:/Users/Rob/Desktop/songs/Adele - Hello.wav",
+					AudioLocation = "/Content/Audio/Adele - Hello.wav",
 					AudioDuration = 30,
 					AudioIn = 5,
 					AudioOut = 10,
