@@ -39,30 +39,15 @@
 						<div class="col-6">
 							<div class="">Select Years</div>
 							<div class="form-group">
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" id="audioYear60" name="audioYear" value="60">
-									<label class="form-check-label" for="audioYear60">60s</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" id="audioYear70" name="audioYear" value="70">
-									<label class="form-check-label" for="audioYear70">70s</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" id="audioYear80" name="audioYear" value="80">
-									<label class="form-check-label" for="audioYear80">80s</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" id="audioYear90" name="audioYear" value="90">
-									<label class="form-check-label" for="audioYear90">90s</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" id="audioYear00" name="audioYear" value="00">
-									<label class="form-check-label" for="audioYear00">00s</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" id="audioYear10" name="audioYear" value="10">
-									<label class="form-check-label" for="audioYear10">10s</label>
-								</div>
+								<select name="audioType" class="form-control">
+									<option selected disabled>Release Year</option>
+									<option value="60">60s</option>
+									<option value="70">70s</option>
+									<option value="80">80s</option>
+									<option value="90">90s</option>
+									<option value="00">00s</option>
+									<option value="10">10s</option>
+								</select>
 							</div>
 						</div>
 					</div>
@@ -71,12 +56,48 @@
 							<div>Upload Audio File</div>
 							<input type="file" />
 						</div>
+						<div class="col-6">
+							<div class="form-row">
+								<div class="col-4">
+									<div>Track In</div>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<div class="input-group-text"><i class="fas fa-angle-double-left"></i></div>
+										</div>
+										<input type="text" class="form-control" name="artistName" placeholder="Audio Title">
+									</div>
+								</div>
+								<div class="col-4">
+									<div>Track Out</div>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<div class="input-group-text"><i class="fas fa-angle-double-right"></i></div>
+										</div>
+										<input type="text" class="form-control" name="artistName" placeholder="Audio Title">
+									</div>
+								</div>
+								<div class="col-4">
+									<div>Track Duration</div>
+									<input type="text" class="form-control" name="audioDuration" id="audioDuration" placeholder="00:00" readonly>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="col-12">
+							<div id="waveform"></div>
+						</div>
 					</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-				<input type="reset" id="filter_music_library_reset_btn" class="btn btn-secondary" value="Reset Filter">
-				<input type="submit" id="filter_music_library_submit_btn" class="btn btn-dark" value="Filter Search">
+				<div class="col-6 d-flex justify-content-start">
+					<i class="fas fa-pause pointer" id="audio_modal_pause"></i>
+					<i class="fas fa-play ml-2 pointer" id="audio_modal_play"></i>
+				</div>
+				<div class="col-6 d-flex justify-content-end">
+					<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+					<input type="submit" id="filter_music_library_submit_btn" class="btn btn-dark ml-1" value="Filter Search">
+				</div>
 			</div>
 			</form>
 		</div>

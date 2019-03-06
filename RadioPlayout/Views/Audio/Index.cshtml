@@ -1,11 +1,12 @@
 ﻿@model PagedList.IPagedList<RadioPlayout.Models.Audio>
 @using PagedList.Mvc;
 <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
-<script src="~/Scripts/Custom/AudioItems.js"></script>
 
+<script src="https://unpkg.com/wavesurfer.js"></script>
+<script src="~/Scripts/Custom/AudioItems.js"></script>
 @{
-    ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewBag.Title = "Index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @Html.Partial("EditAudioItemModal")
@@ -18,7 +19,7 @@
 					<div class="row">
 						<div class="col-8 d-flex align-items-center">Audio Catalogue</div>
 						<div class="col-4 d-flex align-items-center justify-content-end">
-							<button type="button" class="btn btn-success">Add Audio</button>
+							<button type="button" class="btn btn-success" id="add_audio_button">Add Audio</button>
 						</div>
 					</div>
 				</div>
