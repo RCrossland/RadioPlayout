@@ -10,7 +10,7 @@ namespace RadioPlayout.Controllers
 {
     public class RadioPlayerController : Controller
     {
-		RadioPlayoutDb _db = new RadioPlayoutDb();
+		private RadioPlayoutDb _db = new RadioPlayoutDb();
 
         // GET: RadioPlayer
         public ActionResult Index()

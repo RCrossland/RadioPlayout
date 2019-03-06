@@ -37,3 +37,7 @@ C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout.Tests\bin\Debug\EntityFramew
 C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout.Tests\bin\Debug\EntityFramework.SqlServer.dll
 C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout.Tests\bin\Debug\EntityFramework.xml
 C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout.Tests\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout.Tests\bin\Debug\PagedList.dll
+C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout.Tests\bin\Debug\PagedList.Mvc.dll
+C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout.Tests\bin\Debug\PagedList.xml
+C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout.Tests\bin\Debug\PagedList.Mvc.xml

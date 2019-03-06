@@ -84,3 +84,7 @@ C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout\bin\EntityFramework.SqlServe
 C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.Migrations.InitialCreate.resources
 C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.csproj.GenerateResource.cache
 C:\Users\Rob\Source\Repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.csprojAssemblyReference.cache
+C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\bin\PagedList.dll
+C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\bin\PagedList.Mvc.dll
+C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\bin\PagedList.xml
+C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\bin\PagedList.Mvc.xml

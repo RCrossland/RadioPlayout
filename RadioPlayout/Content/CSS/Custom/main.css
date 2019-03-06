@@ -22,6 +22,10 @@
 	user-select: none; /* Standard */
 }
 
+.no-style{
+	color: inherit;
+	text-decoration: none;
+}
 
 /* Left Navigation */
 .left_navigation {
@@ -85,8 +89,7 @@
 	margin-top: 1em;
 }
 
-.left_navigation_list_item {
-}
+
 
 .left_navigation_list_item_link {
 	display: block;

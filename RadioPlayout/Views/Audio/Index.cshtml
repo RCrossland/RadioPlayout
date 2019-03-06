@@ -1,0 +1,141 @@
+﻿@model PagedList.IPagedList<RadioPlayout.Models.Audio>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+<script src="~/Scripts/Custom/AudioItems.js"></script>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.Partial("EditAudioItemModal")
+
+<div class="container-fluid">
+	<div class="row no-gutters">
+		<div class="col-8">
+			<div class="card">
+				<div class="card-header bg-dark text-white">
+					<div class="row">
+						<div class="col-8 d-flex align-items-center">Audio Catalogue</div>
+						<div class="col-4 d-flex align-items-center justify-content-end">
+							<button type="button" class="btn btn-success">Add Audio</button>
+						</div>
+					</div>
+				</div>
+				<div class="card-body overflow-hidden p-0">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th scope="col"></th>
+								<th scope="col">
+									@Html.ActionLink("Artist Name", "Index", new { sortOrder = ViewBag.ArtistNameSortParam, currentFilter = ViewBag.CurrentFilter }, new { @class = "no-style" })
+								</th>
+								<th scope="col">
+									@Html.ActionLink("Audio Title", "Index", new { sortOrder = ViewBag.AudioTitleSortParam, currentFilter = ViewBag.CurrentFilter }, new { @class = "no-style" })
+								</th>
+								<th scope="col">
+									@Html.ActionLink("Duration", "Index", new { sortOrder = ViewBag.AudioDurationSortParam, currentFilter = ViewBag.CurrentFilter }, new { @class = "no-style" })
+								</th>
+								<th scope="col">Year</th>
+								<th scope="col">Type</th>
+								<th scope="col"></th>
+								<th scope="col"></th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var item in Model)
+							{
+								<tr>
+									<td class="text-center"><i class="fas fa-play pointer"></i></td>
+									<td>@item.ArtistName</td>
+									<td>@item.AudioTitle</td>
+									<td>@item.AudioDuration</td>
+									<td>@item.AudioReleaseYear</td>
+									<td>@item.AudioType.AudioTypeName</td>
+									<td><i class="fas fa-pencil-alt pointer"></i></td>
+									<td><i class="fas fa-times pointer"></i></td>
+								</tr>
+							}
+						</tbody>
+					</table>
+					<div class="ml-3">
+						Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+						@Html.PagedListPager(Model, page => Url.Action("Index", new { page, sortOrder = ViewBag.CurrentSort, currentSearchString = ViewBag.currentSearchString, currentAudioType = ViewBag.currentAudioType, currentAudioMinDuration = ViewBag.currentAudioMinDuration, currentAudioMaxDuration = ViewBag.currentAudioMaxDuration, currentAudioYear = ViewBag.currentAudioyear }))
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="card">
+				<form>
+					<div class="card-header bg-dark text-white">
+						<div class="row">
+							<div class="col-8 d-flex align-items-center">Filter Audio Catalogue</div>
+							<div class="col-4 d-flex align-items-center justify-content-end">
+								<input type="submit" class="btn btn-secondary" value="Filter">
+							</div>
+						</div>
+					</div>
+					<div class="card-body overflow-hidden">
+						<div class="form-group">
+							<div class="input-group">
+								<div class="input-group-prepend">
+									<div class="input-group-text"><i class="fas fa-search"></i></div>
+								</div>
+								<input type="text" class="form-control" name="searchString" placeholder="Search for an artist or song title">
+							</div>
+						</div>
+						<div class="form-group">
+							<select name="audioType" class="form-control">
+								<option selected disabled>Track Type</option>
+								<option value="1">Song</option>
+								<option value="2">Jingle</option>
+								<option value="3">Bed</option>
+								<option value="4">FX</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<div>Time Selection</div>
+							<div class="form-row">
+								<div class="col-6">
+									<input type="text" class="form-control" name="audioMinDuration" placeholder="Min time">
+								</div>
+								<div class="col-6">
+									<input type="text" class="form-control" name="audioMaxDuration" placeholder="Max time">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div>Select Years</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" id="audioYear60" name="audioYear" value="60">
+								<label class="form-check-label" for="audioYear60">60s</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" id="audioYear70" name="audioYear" value="70">
+								<label class="form-check-label" for="audioYear70">70s</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" id="audioYear80" name="audioYear" value="80">
+								<label class="form-check-label" for="audioYear80">80s</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" id="audioYear90" name="audioYear" value="90">
+								<label class="form-check-label" for="audioYear90">90s</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" id="audioYear00" name="audioYear" value="00">
+								<label class="form-check-label" for="audioYear00">00s</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" id="audioYear10" name="audioYear" value="10">
+								<label class="form-check-label" for="audioYear10">10s</label>
+							</div>
+						</div>
+						<span class="text-secondary">@ViewBag.AudioCount Results Returned.</span>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

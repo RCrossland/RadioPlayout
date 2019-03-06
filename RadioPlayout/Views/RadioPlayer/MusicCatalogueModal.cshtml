@@ -1,0 +1,85 @@
+﻿<!-- Music Library Modal -->
+<div class="modal fade" id="music_library_modal" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Music Library Filter</h5>
+				<div class="text-right text-secondary" id="music_library_results_returned"></div>
+			</div>
+			<div class="modal-body">
+				<form method="POST" id="filter_music_library_form">
+					<div class="form-row">
+						<div class="col-6">
+							<div class="form-group">
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<div class="input-group-text"><i class="fas fa-search"></i></div>
+									</div>
+									<input type="text" class="form-control" name="audioSearch" placeholder="Search for an artist or song title">
+								</div>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="form-group">
+								<select name="audioType" class="form-control">
+									<option selected disabled>Track Type</option>
+									<option value="1">Song</option>
+									<option value="2">Jingle</option>
+									<option value="3">Bed</option>
+									<option value="4">FX</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="col-6">
+							<div class="">Time Selection</div>
+							<div class="form-row">
+								<div class="col-6">
+									<input type="text" class="form-control" name="audioMinDuration" placeholder="Min time">
+								</div>
+								<div class="col-6">
+									<input type="text" class="form-control" name="audioMaxDuration" placeholder="Max time">
+								</div>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="">Select Years</div>
+							<div class="form-group">
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" id="audioYear60" name="audioYear" value="60">
+									<label class="form-check-label" for="audioYear60">60s</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" id="audioYear70" name="audioYear" value="70">
+									<label class="form-check-label" for="audioYear70">70s</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" id="audioYear80" name="audioYear" value="80">
+									<label class="form-check-label" for="audioYear80">80s</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" id="audioYear90" name="audioYear" value="90">
+									<label class="form-check-label" for="audioYear90">90s</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" id="audioYear00" name="audioYear" value="00">
+									<label class="form-check-label" for="audioYear00">00s</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" id="audioYear10" name="audioYear" value="10">
+									<label class="form-check-label" for="audioYear10">10s</label>
+								</div>
+							</div>
+						</div>
+					</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+				<input type="reset" id="filter_music_library_reset_btn" class="btn btn-secondary" value="Reset Filter">
+				<input type="submit" id="filter_music_library_submit_btn" class="btn btn-dark" value="Filter Search">
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
