@@ -3,43 +3,46 @@
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title">Edit Audio Item</h5>
+				<h5 class="modal-title" id="audio_modal_title"></h5>
 			</div>
 			<div class="modal-body">
-				<form method="POST" id="">
+				<form method="POST" id="audio_item_form" data-add-url="@Url.Action("AddNewAudioItem")" data-update-url="@Url.Action("UpdateAudioItem")">
 					<div class="form-row">
 						<div class="col-6">
 							<div class="form-group">
 								<div class="input-group">
-									<input type="text" class="form-control" name="artistName" placeholder="Artist Name">
+									<input type="text" class="form-control" id="artist_name" name="artistName" placeholder="Artist Name">
 								</div>
+								<div class="text-danger" id="artist_name_error"></div>
 							</div>
 						</div>
 						<div class="col-6">
 							<div class="form-group">
 								<div class="input-group">
-									<input type="text" class="form-control" name="artistName" placeholder="Audio Title">
+									<input type="text" class="form-control" id="audio_title" name="audioTitle" placeholder="Audio Title">
 								</div>
+								<div class="text-danger" id="audio_title_error"></div>
 							</div>
 						</div>
 					</div>
 					<div class="form-row">
 						<div class="col-6">
-							<div class="">Time Selection</div>
+							<div class="">Audio Type</div>
 							<div class="form-group">
-								<select name="audioType" class="form-control">
+								<select id="audio_type" name="audioType" class="form-control">
 									<option selected disabled>Track Type</option>
 									<option value="1">Song</option>
 									<option value="2">Jingle</option>
 									<option value="3">Bed</option>
 									<option value="4">FX</option>
 								</select>
+								<div class="text-danger" id="audio_type_error"></div>
 							</div>
 						</div>
 						<div class="col-6">
 							<div class="">Select Years</div>
 							<div class="form-group">
-								<select name="audioType" class="form-control">
+								<select id="audio_release_year" name="audioType" class="form-control">
 									<option selected disabled>Release Year</option>
 									<option value="60">60s</option>
 									<option value="70">70s</option>
@@ -48,37 +51,38 @@
 									<option value="00">00s</option>
 									<option value="10">10s</option>
 								</select>
+								<div class="text-danger" id="audio_release_year_error"></div>
 							</div>
 						</div>
 					</div>
 					<div class="form-row">
-						<div class="col-6">
+						<div class="col-4">
 							<div>Upload Audio File</div>
 							<input type="file" />
 						</div>
-						<div class="col-6">
+						<div class="col-8">
 							<div class="form-row">
 								<div class="col-4">
 									<div>Track In</div>
 									<div class="input-group">
 										<div class="input-group-prepend">
-											<div class="input-group-text"><i class="fas fa-angle-double-left"></i></div>
+											<div class="input-group-text" id="audio_in_check"><i class="fas fa-angle-double-left"></i></div>
 										</div>
-										<input type="text" class="form-control" name="artistName" placeholder="Audio Title">
+										<input type="text" class="form-control" id="audio_in" name="audioIn" value="00:00">
 									</div>
 								</div>
 								<div class="col-4">
 									<div>Track Out</div>
 									<div class="input-group">
 										<div class="input-group-prepend">
-											<div class="input-group-text"><i class="fas fa-angle-double-right"></i></div>
+											<div class="input-group-text" id="audio_out_check"><i class="fas fa-angle-double-right"></i></div>
 										</div>
-										<input type="text" class="form-control" name="artistName" placeholder="Audio Title">
+										<input type="text" class="form-control" id="audio_out" name="audioOut" value="00:00">
 									</div>
 								</div>
 								<div class="col-4">
 									<div>Track Duration</div>
-									<input type="text" class="form-control" name="audioDuration" id="audioDuration" placeholder="00:00" readonly>
+									<input type="text" class="form-control" name="audioDuration" id="audio_duration" placeholder="00:00:00" readonly>
 								</div>
 							</div>
 						</div>
@@ -96,7 +100,7 @@
 				</div>
 				<div class="col-6 d-flex justify-content-end">
 					<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-					<input type="submit" id="filter_music_library_submit_btn" class="btn btn-dark ml-1" value="Filter Search">
+					<input type="submit" id="audio_modal_button" class="btn btn-dark ml-1" value="Edit Audio">
 				</div>
 			</div>
 			</form>

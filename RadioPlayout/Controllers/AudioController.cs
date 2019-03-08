@@ -110,5 +110,18 @@ namespace RadioPlayout.Controllers
 			int pageNumber = (page ?? 1);
             return View(audio.ToPagedList(pageNumber, pageSize));
         }
-    }
+
+		[HttpPost]
+		public ActionResult AddNewAudioItem()
+		{
+			return Json("", JsonRequestBehavior.AllowGet);
+		}
+
+		[HttpPost]
+		public ActionResult UpdateAudioItem()
+		{
+			return Json("", JsonRequestBehavior.AllowGet);
+		}
+
+	}
 }
