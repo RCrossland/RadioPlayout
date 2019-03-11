@@ -5,6 +5,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using PagedList;
+using System.Net;
+using System.IO;
 
 namespace RadioPlayout.Controllers
 {
@@ -112,9 +114,167 @@ namespace RadioPlayout.Controllers
         }
 
 		[HttpPost]
-		public ActionResult AddNewAudioItem()
+		public ActionResult AddNewAudioItem(string artistName, string audioTitle, string audioLocation, string audioDuration,
+			string audioIn, string audioOut, string audioReleaseYear, string audioType)
 		{
-			return Json("", JsonRequestBehavior.AllowGet);
+			// Placeholders when converting the timings strings to integers
+			int audioDurationInt = 0;
+			int audioInInt = 0;
+			int audioOutInt = 0;
+			int audioReleaseYearInt = 0;
+			int audioTypeInt = 0;
+			string uploadPath = Server.MapPath("~/Content/Audio/Upload/" + audioLocation);
+			string audioPath = Server.MapPath("~/Content/Audio/" + audioLocation);
+
+			// Dictionary to hold key value error pairs
+			Dictionary<string, string> errorDict = new Dictionary<string, string>();
+
+			// Validate the inputted values
+			// Validate the artist name
+			if (String.IsNullOrWhiteSpace(artistName))
+			{
+				// Artist name doesn't have a value
+				errorDict.Add("ArtistName", "The artist name cannot be empty.");
+			}
+
+			// Validate the audio title
+			if (string.IsNullOrWhiteSpace(audioTitle))
+			{
+				// Audio title doesn't have a value
+				errorDict.Add("AudioTitle", "The audio title cannot be empty.");
+			}
+
+			// Validate the audio location
+			if (String.IsNullOrWhiteSpace(audioLocation))
+			{
+				// Audio location doesn't have a value
+				errorDict.Add("AudioLocation", "The audio location cannot be empty.");
+			}
+			else if(!System.IO.File.Exists(uploadPath))
+			{
+				// Audio is not in the default upload directory
+				errorDict.Add("AudioLocation", "The audio file has not been uploaded, please try again");
+			}
+
+			// Validate the audio duration
+			if (String.IsNullOrWhiteSpace(audioDuration))
+			{
+				// Audio duration doesn't have a value
+				errorDict.Add("AudioDuration", "The audio duration cannot be empty.");
+			}
+			else if(!Int32.TryParse(audioDuration, out audioDurationInt))
+			{
+				// Audio Duration couldn't be converted to an integer
+				errorDict.Add("AudioDuration", "The audio duration couldn't be converted to an integer");
+			}
+
+			// Validate the audio in
+			if (String.IsNullOrWhiteSpace(audioIn))
+			{
+				// Audio in doesn't have a value
+				errorDict.Add("AudioIn", "The audio in cannot be empty");
+			}
+			else if(!Int32.TryParse(audioIn, out audioInInt))
+			{
+				// Audio in couldn't be converted to an integer
+				errorDict.Add("AudioIn", "The audio in couldn't be converted to an integer");
+			}
+
+			// Vaidate the audio out
+			if (String.IsNullOrWhiteSpace(audioOut))
+			{
+				// Audio out doesn't have a value
+				errorDict.Add("AudioOut", "The audio out cannot be empty.");
+			}
+			else if(!Int32.TryParse(audioOut, out audioOutInt))
+			{
+				// Audio out couldn't be converted to an integer
+				errorDict.Add("AudioOut", "The audio out couldn't be converted to an integer.");
+			}
+
+			// Validate the release year
+			if (String.IsNullOrWhiteSpace(audioReleaseYear))
+			{
+				// Audio release year doesn't have a value
+				errorDict.Add("AudioReleaseYear", "The audio release year cannot be empty");
+			}
+			else if(!Int32.TryParse(audioReleaseYear, out audioReleaseYearInt))
+			{
+				// Audio release year couldn't be converted to an integer
+				errorDict.Add("AudioReleaseYear", "The audio release year couldn't be converted to an integer.");
+			}
+
+			// Validate the audio type
+			if (String.IsNullOrWhiteSpace(audioType))
+			{
+				// Audio type doesn't have a value
+				errorDict.Add("AudioType", "THe audio type cannot be empty.");
+			}
+			else if(!Int32.TryParse(audioType, out audioTypeInt))
+			{
+				// Audio type couldn't be converted to an integer
+				errorDict.Add("AudioType", "The audio type couldn't be converted to an integer");
+			}
+
+
+			if (errorDict.Count > 0)
+			{
+				// The validation brought up errors. Do NOT add the audio item
+				Response.StatusCode = (int)HttpStatusCode.BadRequest;
+				return Json(errorDict);
+			}
+			else
+			{
+				// Move the file from Content/Audio/Upload to Content/Audio
+				if (System.IO.File.Exists(audioPath))
+				{
+					System.IO.File.Delete(audioPath);
+				}
+				System.IO.File.Move(uploadPath, audioPath);
+
+				// Remove all the files in the Upload directory
+				System.IO.DirectoryInfo di = new DirectoryInfo(Server.MapPath("~/Content/Audio/Upload/"));
+				foreach (FileInfo file in di.GetFiles())
+				{
+					file.Delete();
+				}
+
+				// Get the audio type id
+				AudioType audioTypeRef = _db.AudioType.Where(r => r.AudioTypeId.Equals(audioTypeInt)).First();
+
+				// No errors were produced. The audio can be added
+				Audio newAudio = new Audio
+				{
+					ArtistName = artistName,
+					AudioTitle = audioTitle,
+					AudioLocation = "Content/Audio/" + audioLocation,
+					AudioDuration = audioDurationInt,
+					AudioIn = audioInInt,
+					AudioOut = audioOutInt,
+					AudioReleaseYear = audioReleaseYearInt,
+					AudioType = audioTypeRef
+				};
+
+				_db.Audio.Add(newAudio);
+				_db.SaveChanges();
+
+				Response.StatusCode = (int)HttpStatusCode.OK;
+				return Json("Success");
+			}
+		}
+
+		[HttpPost]
+		public ActionResult UploadAudioFile()
+		{
+			HttpPostedFileBase file = Request.Files[0];
+			int fileSize = file.ContentLength;
+			string fileName = file.FileName;
+			string mimeType = file.ContentType;
+			string filePath = "/Content/Audio/Upload/" + fileName;
+
+			file.SaveAs(Server.MapPath(filePath));
+
+			return Json(filePath);
 		}
 
 		[HttpPost]

@@ -22,8 +22,8 @@
 	user-select: none; /* Standard */
 }
 
-.no-style{
-	color: inherit;
+.no_style{
+	color: inherit!important;
 	text-decoration: none;
 }
 
