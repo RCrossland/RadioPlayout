@@ -251,8 +251,7 @@ let editAudioItems = {
         });
     },
     editAudioItemSubmit: function () {
-        console.log($("#audio_item_form").attr("data-audio-id"));
-
+        console.log(s.audioFileRef.data("file-name"));
         $.ajax({
             url: $("#audio_item_form").data("update-url"),
             type: "POST",
@@ -268,7 +267,7 @@ let editAudioItems = {
                 "audioType": s.audioTypeRef.val()
             },
             success: function () {
-
+                $("#audio_modal_success").text("The audio item was successfully updated.");
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 //or you can put jqXHR.responseText somewhere as complete response. Its html.
@@ -473,7 +472,7 @@ let editAudioItems = {
                 s.audioReleaseYearRef.val(audioItem.AudioReleaseYear);
 
                 $("#audio_item_form").attr("data-audio-id", audioItem.AudioId);
-                $("#audio_file_upload").attr("data-file-name", audioItem.AudioLocation.split('/').pop()); // Split the file path just to get the filename
+                $("#audio_file_upload").attr("data-file-name", audioItem.AudioLocation.split('\\').pop()); // Split the file path just to get the filename
 
                 let date = new Date(null);
                 date.setSeconds(audioItem.AudioIn);
@@ -485,7 +484,6 @@ let editAudioItems = {
                 editAudioItems.loadWaveForm(audioItem.AudioLocation.replace(/["]+/g, ''));
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                console.log("Error");
             }
         })
     }

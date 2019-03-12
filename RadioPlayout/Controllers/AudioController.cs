@@ -309,9 +309,9 @@ namespace RadioPlayout.Controllers
 			{
 				errorDict.Add("AudioItem", "There was an error updating this audio item. Please try again.");
 			}
-			else if(Int32.TryParse(audioId, out audioIdInt))
+			else if(!Int32.TryParse(audioId, out audioIdInt))
 			{
-				errorDict.Add("AudioItem", "There wasn an error updating this audio item. Please try again");
+				errorDict.Add("AudioItem", "There was an error updating this audio item. Please try again");
 			}
 
 			if (errorDict.Count > 0)
@@ -326,30 +326,29 @@ namespace RadioPlayout.Controllers
 				if (System.IO.File.Exists(uploadPath))
 				{
 					// If the file is in uploadPath. Check whether it exists in the /Content/Audio directory
-					if (System.IO.File.Exists(audioPath))
+					if (!System.IO.File.Exists(audioPath))
 					{
-						System.IO.File.Delete(uploadPath);
+						System.IO.File.Move(uploadPath, audioPath);
 					}
-
-					System.IO.File.Move(uploadPath, audioPath);
 				}
 
 				// Remove all the files in the Upload directory
-				System.IO.DirectoryInfo di = new DirectoryInfo(Server.MapPath("~/Content/Audio/Upload/"));
+				System.IO.DirectoryInfo di = new DirectoryInfo(uploadAudioDirectory);
 				foreach (FileInfo file in di.GetFiles())
 				{
 					file.Delete();
 				}
 
 				// Get the audio type id
-				AudioType audioTypeRef = _db.AudioType.Where(r => r.AudioTypeId.Equals(Int32.Parse(audioType))).First();
+				int audioTypeIdInt = Int32.Parse(audioType);
+				AudioType audioTypeRef = _db.AudioType.Where(r => r.AudioTypeId.Equals(audioTypeIdInt)).First();
 
 				var audioItems = _db.Audio.Where(r => r.AudioId.Equals(audioIdInt));
 				foreach(Audio audioItem in audioItems)
 				{
 					audioItem.ArtistName = artistName;
 					audioItem.AudioTitle = audioTitle;
-					audioItem.AudioLocation = audioPath;
+					audioItem.AudioLocation = "/Content/Audio/" + audioLocation;
 					audioItem.AudioDuration = Int32.Parse(audioDuration);
 					audioItem.AudioIn = Int32.Parse(audioIn);
 					audioItem.AudioOut = Int32.Parse(audioOut);
@@ -358,6 +357,7 @@ namespace RadioPlayout.Controllers
 				}
 				_db.SaveChanges();
 
+				Response.StatusCode = (int)HttpStatusCode.OK;
 				return Json("Success");
 			}
 		}
