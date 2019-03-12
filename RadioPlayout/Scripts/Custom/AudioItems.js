@@ -25,6 +25,7 @@ let editAudioItems = {
         audioFileRef: null,
 
         // Audio form error references
+        audioModalError: null,
         artistNameErrorRef: null,
         audioTitleErrorRef: null,
         audioTypeErrorRef: null,
@@ -59,6 +60,7 @@ let editAudioItems = {
         s.audioDurationRef = $("#audio_duration");
         s.audioFileRef = $("#audio_file_upload");
 
+        s.audioModalError = $("#audio_modal_error");
         s.artistNameErrorRef = $("#artist_name_error");
         s.audioTitleErrorRef = $("#audio_title_error");
         s.audioTypeErrorRef = $("#audio_type_error");
@@ -91,6 +93,9 @@ let editAudioItems = {
             // Show the audio items modal
             $("#audio_items_modal").modal('show');
 
+            // reset the Audio Item form
+            s.audioItemForm.trigger("reset");
+
             // Set the audioModalType to reference adding a new audio type
             s.audioModalType = "editAudioItem";
 
@@ -100,8 +105,7 @@ let editAudioItems = {
             // Set the audio item button
             s.audioModalButton.val("Edit Audio Item");
 
-            // Load audio into WaveSurfer
-            editAudioItems.loadWaveForm('/Content/Audio/Olly Murs - Excuses.wav');
+            editAudioItems.getAudioItemInfo($(this).data("audio-id"), $(this).data("get-audio"));
         });
 
         $("#audio_modal_pause").click(function () {
@@ -116,7 +120,7 @@ let editAudioItems = {
             e.preventDefault();
 
             // TODO: Change this back to validate the audio form
-            if (editAudioItems.validateAudioForm()) {
+            if (editAudioItems.validateAudioForm(s.audioModalType)) {
                 // Form is valid and can submit
                 if (s.audioModalType == "addAudioItem") {
                     editAudioItems.addNewAudioItemSubmit();
@@ -211,8 +215,8 @@ let editAudioItems = {
     validateAudioForm: function () {
         if (editAudioItems.validateArtistName() && editAudioItems.validateAudioTitle() &&
             editAudioItems.validateAudioType() && editAudioItems.validateReleaseYears() &&
-            editAudioItems.validateAudioIn() && editAudioItems.validateAudioOut() &&
-            editAudioItems.validateAudioDuration()) {
+            editAudioItems.validateAudioLocation() && editAudioItems.validateAudioIn() &&
+            editAudioItems.validateAudioOut() && editAudioItems.validateAudioDuration()) {
             // Form can submit
             return true;
         }
@@ -241,63 +245,28 @@ let editAudioItems = {
             error: function (jqXHR, textStatus, errorThrown) {
                 let response = jqXHR.responseJSON;
 
-                if (response.hasOwnProperty("ArtistName")) {
-                    s.artistNameErrorRef.text(response.ArtistName);
-                }
-                else {
-                    s.artistNameErrorRef.text("");
-                }
-
-                if (response.hasOwnProperty("AudioTitle")) {
-                    s.audioTitleErrorRef.text(response.AudioTitle);
-                }
-                else {
-                    s.audioTitleErrorRef.text("");
-                }
-
-                if (response.hasOwnProperty("AudioDuration")) {
-                    s.audioDurationErrorRef.text(response.AudioDuration);
-                }
-                else {
-                    s.audioDurationErrorRef.text("");
-                }
-
-                if (response.hasOwnProperty("AudioIn")) {
-                    s.audioInErrorRef.text(response.AudioIn);
-                }
-                else {
-                    s.audioInErrorRef.text("");
-                }
-
-                if (response.hasOwnProperty("AudioOut")) {
-                    s.audioOutErrorRef.text(response.AudioOut);
-                }
-                else {
-                    s.audioOutErrorRef.text("");
-                }
-
-                if (response.hasOwnProperty("AudioReleaseYear")) {
-                    s.audioReleaseYearErrorRef.text(response.AudioReleaseYear);
-                }
-                else {
-                    s.audioReleaseYearErrorRef.text("");
-                }
-
-                if (response.hasOwnProperty("AudioType")) {
-                    s.audioTypeErrorRef.text(response.AudioType);
-                }
-                else {
-                    s.audioTypeErrorRef.text("");
-                }
+                console.log("Sending to Display Validation");
+                editAudioItems.displayValidation(response);
             }
         });
     },
     editAudioItemSubmit: function () {
-        console.log("Upading....");
+        console.log($("#audio_item_form").attr("data-audio-id"));
+
         $.ajax({
             url: $("#audio_item_form").data("update-url"),
             type: "POST",
-            data: {},
+            data: {
+                "audioId": $("#audio_item_form").attr("data-audio-id"),
+                "artistName": s.artistNameRef.val(),
+                "audioTitle": s.audioTitleRef.val(),
+                "audioLocation": s.audioFileRef.data("file-name"),
+                "audioDuration": editAudioItems.getSeconds(s.audioDurationRef.val()),
+                "audioIn": editAudioItems.getSeconds(s.audioInRef.val()),
+                "audioOut": editAudioItems.getSeconds(s.audioOutRef.val()),
+                "audioReleaseYear": s.audioReleaseYearRef.val(),
+                "audioType": s.audioTypeRef.val()
+            },
             success: function () {
 
             },
@@ -357,6 +326,18 @@ let editAudioItems = {
             return true;
         }
     },
+    validateAudioLocation: function (audioModalType) {
+        if (s.audioFileRef[0].files.length <= 0 && audioModalType == "addAudioItem") {
+            // User has added any audio files
+            s.audioModalError.text("Please upload an audio file");
+            return false;
+        }
+        else {
+            // User has uploaded an audio file
+            s.audioModalError.text("");
+            return true;
+        }
+    },
     validateAudioIn: function () {
         if (editAudioItems.getSeconds(s.audioInRef.val()) == -1) {
             s.audioInErrorRef.text("There was an error.");
@@ -387,6 +368,70 @@ let editAudioItems = {
             return true;
         }
     },
+    displayValidation: function (ajaxResponse) {
+        if (ajaxResponse.hasOwnProperty("ArtistName")) {
+            s.artistNameErrorRef.text(ajaxResponse.ArtistName);
+        }
+        else {
+            s.artistNameErrorRef.text("");
+        }
+
+        if (ajaxResponse.hasOwnProperty("AudioTitle")) {
+            s.audioTitleErrorRef.text(ajaxResponse.AudioTitle);
+        }
+        else {
+            s.audioTitleErrorRef.text("");
+        }
+
+        if (ajaxResponse.hasOwnProperty("AudioLocation")) {
+            s.audioModalError.text(ajaxResponse.AudioLocation);
+        }
+        else {
+            s.audioModalError.text("");
+        }
+
+        if (ajaxResponse.hasOwnProperty("AudioDuration")) {
+            s.audioDurationErrorRef.text(ajaxResponse.AudioDuration);
+        }
+        else {
+            s.audioDurationErrorRef.text("");
+        }
+
+        if (ajaxResponse.hasOwnProperty("AudioIn")) {
+            s.audioInErrorRef.text(ajaxResponse.AudioIn);
+        }
+        else {
+            s.audioInErrorRef.text("");
+        }
+
+        if (ajaxResponse.hasOwnProperty("AudioOut")) {
+            s.audioOutErrorRef.text(ajaxResponse.AudioOut);
+        }
+        else {
+            s.audioOutErrorRef.text("");
+        }
+
+        if (ajaxResponse.hasOwnProperty("AudioReleaseYear")) {
+            s.audioReleaseYearErrorRef.text(ajaxResponse.AudioReleaseYear);
+        }
+        else {
+            s.audioReleaseYearErrorRef.text("");
+        }
+
+        if (ajaxResponse.hasOwnProperty("AudioType")) {
+            s.audioTypeErrorRef.text(ajaxResponse.AudioType);
+        }
+        else {
+            s.audioTypeErrorRef.text("");
+        }
+
+        if (ajaxResponse.hasOwnProperty("Audio")) {
+            s.audioModalError.text(ajaxResponse.Audio);
+        }
+        else {
+            s.audioModalError.text("");
+        }
+    },
     getSeconds: function (timeRef) {
         // Split data based on ':'
         let timeRefSplit = timeRef.split(":");
@@ -408,6 +453,41 @@ let editAudioItems = {
         else {
             return -1;
         }
+    },
+    getAudioItemInfo: function (audioId, getAudioItemFunction) {
+        if (audioId == null || audioId == "") {
+            s.audioModalError.text("The audio item couldn't be found. Please try again.");
+        }
+
+        $.ajax({
+            url: getAudioItemFunction,
+            type: "POST",
+            data: { "audioId": audioId },
+            success: function (data) {
+                let audioItem = data[0];
+
+                // Set the audio form values
+                s.artistNameRef.val(audioItem.ArtistName);
+                s.audioTitleRef.val(audioItem.AudioTitle);
+                s.audioTypeRef.val(audioItem.AudioType.AudioTypeId)
+                s.audioReleaseYearRef.val(audioItem.AudioReleaseYear);
+
+                $("#audio_item_form").attr("data-audio-id", audioItem.AudioId);
+                $("#audio_file_upload").attr("data-file-name", audioItem.AudioLocation.split('/').pop()); // Split the file path just to get the filename
+
+                let date = new Date(null);
+                date.setSeconds(audioItem.AudioIn);
+                s.audioInRef.val(date.toISOString().substr(11, 8));
+
+                date.setSeconds(audioItem.AudioOut);
+                s.audioOutRef.val(date.toISOString().substr(11, 8));
+
+                editAudioItems.loadWaveForm(audioItem.AudioLocation.replace(/["]+/g, ''));
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log("Error");
+            }
+        })
     }
 }
 

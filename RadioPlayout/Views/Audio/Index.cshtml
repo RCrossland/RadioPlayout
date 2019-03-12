@@ -53,7 +53,7 @@
 									<td>@item.AudioDuration</td>
 									<td>@item.AudioReleaseYear</td>
 									<td>@item.AudioType.AudioTypeName</td>
-									<td><i class="fas fa-pencil-alt pointer edit_audio_item"></i></td>
+									<td><i class="fas fa-pencil-alt pointer edit_audio_item" data-audio-id="@item.AudioId" data-get-audio="@Url.Action("GetAudioItemInfo")"></i></td>
 									<td><i class="fas fa-times pointer"></i></td>
 								</tr>
 							}

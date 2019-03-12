@@ -6,7 +6,7 @@
 				<h5 class="modal-title" id="audio_modal_title"></h5>
 			</div>
 			<div class="modal-body">
-				<form method="POST" id="audio_item_form" data-add-url="@Url.Action("AddNewAudioItem")" data-update-url="@Url.Action("UpdateAudioItem")">
+				<form method="POST" id="audio_item_form" data-add-url="@Url.Action("AddNewAudioItem")" data-update-url="@Url.Action("UpdateAudioItem")" data-audio-id="">
 					<div class="form-row">
 						<div class="col-6">
 							<div class="form-group">
@@ -102,7 +102,8 @@
 					<i class="fas fa-play ml-2 pointer" id="audio_modal_play"></i>
 				</div>
 				<div class="col-8 d-flex justify-content-end">
-					<div class="text-success" id="audio_modal_success"></div>
+					<div class="text-danger pr-1" id="audio_modal_error"></div>
+					<div class="text-success pr-1" id="audio_modal_success"></div>
 
 					<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
 					<input type="submit" id="audio_modal_button" class="btn btn-dark ml-1" value="Edit Audio">
