@@ -108,6 +108,10 @@ let editAudioItems = {
             editAudioItems.getAudioItemInfo($(this).data("audio-id"), $(this).data("get-audio"));
         });
 
+        $(".delete_audio_item").on("click", function () {
+            editAudioItems.deleteAudioItem($(this).data("audio-id"));
+        });
+
         $("#audio_modal_pause").click(function () {
             editAudioItems.settings.wavesurfer.pause();
         });
@@ -273,6 +277,27 @@ let editAudioItems = {
                 //or you can put jqXHR.responseText somewhere as complete response. Its html.
             }
         });
+    },
+    deleteAudioItem: function (audioId) {
+        // Validate audioId has a value
+        if (audioId == "" || audioId == null) {
+
+        }
+        else {
+            $.ajax({
+                url: $("#audio_card_outer").data("delete-item"),
+                type: "POST",
+                data: { "audioId": audioId },
+                success: function () {
+                    $("#autio_filter_success").text("Item deleted successfully.");
+                    $("#audio_filter_error").text("")
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("#autio_filter_success").text("")
+                    $("#audio_filter_error").text("Error deleting item. Please try again");
+                }
+            })
+        }
     },
     stripInput: function (input) {
         // Strip the user input of any harmful inputs

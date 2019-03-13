@@ -20,6 +20,22 @@ namespace RadioPlayout.Controllers
 
 
 		// GET: Audio
+		/// <summary>
+		/// Index controller of the Audio Items. Passing to the view a filtered version of the AudioItems DB
+		/// </summary>
+		/// <param name="sortOrder">The current sort parameters.</param>
+		/// <param name="searchString">Artist Name or Audio title to search by.</param>
+		/// <param name="currentSearchString">Wether a search string has already been inputted.</param>
+		/// <param name="audioType">The audio type to search for.</param>
+		/// <param name="currentAudioType">Whether an audio type has already been inputted.</param>
+		/// <param name="audioMinDuration">The min audio duration to search for.</param>
+		/// <param name="currentAudioMinDuration">Whether a min audio duration has already been inputted.</param>
+		/// <param name="audioMaxDuration">The max audio duration to search for.</param>
+		/// <param name="currentAudioMaxDuration">Whether an audio max duration has already been inputted.</param>
+		/// <param name="audioYear">The audio release year to search for.</param>
+		/// <param name="currentAudioYear">Whether an audio release year has already been inputted.</param>
+		/// <param name="page">The current page of the pagination.</param>
+		/// <returns></returns>
 		public ViewResult Index(string sortOrder, string searchString, string currentSearchString, string audioType, string currentAudioType, string audioMinDuration, 
 			string currentAudioMinDuration, string audioMaxDuration, string currentAudioMaxDuration, string audioYear, string currentAudioYear, int? page)
         {
@@ -118,6 +134,19 @@ namespace RadioPlayout.Controllers
             return View(audio.ToPagedList(pageNumber, pageSize));
         }
 
+		/// <summary>
+		/// Validate the different Audio Items and add the errors to the global Error dictionary.
+		/// </summary>
+		/// <param name="artistName">The Artist Name to validate.</param>
+		/// <param name="audioTitle">The Audio Title to validate.</param>
+		/// <param name="audioLocation">The Audio Location to validate.</param>
+		/// <param name="uploadPath">The directory where the audio files are uploaded.</param>
+		/// <param name="audioPath">The directory where the validate audio files are kept.</param>
+		/// <param name="audioDuration">The Audio Duration to validate.</param>
+		/// <param name="audioIn">The Audio In to validate.</param>
+		/// <param name="audioOut">The Audio Out to validate.</param>
+		/// <param name="audioReleaseYear">The Audio Release Year to validate.</param>
+		/// <param name="audioType">The Audio Type to validate.</param>
 		public void ValidateAudioItems(string artistName, string audioTitle, string audioLocation, string uploadPath, string audioPath, 
 			string audioDuration, string audioIn, string audioOut, string audioReleaseYear, string audioType)
 		{
@@ -215,6 +244,19 @@ namespace RadioPlayout.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Add a new Audio Item to the Audio DB. The items will each be validated first and then added to the database.
+		/// If the validate throws an errors a Json object will be returned with the error.
+		/// </summary>
+		/// <param name="artistName">The Artist Name.</param>
+		/// <param name="audioTitle">The Audio Title.</param>
+		/// <param name="audioLocation">Where the directory where the audio item has been uploaded to.</param>
+		/// <param name="audioDuration">The duration of the audio item. This will be converted to an integer.</param>
+		/// <param name="audioIn">Where audio item intro has ended. This will be converted to an integer.</param>
+		/// <param name="audioOut">Where the audio item has ended. This will be converted to an integer.</param>
+		/// <param name="audioReleaseYear">The century that the audio item was released. This will be converted to an integer.</param>
+		/// <param name="audioType">The audio type id of the audio item. This will be converted to an integer.</param>
+		/// <returns>A Json object with '200' if the audio item was successfully added.</returns>
 		[HttpPost]
 		public ActionResult AddNewAudioItem(string artistName, string audioTitle, string audioLocation, string audioDuration,
 			string audioIn, string audioOut, string audioReleaseYear, string audioType)
@@ -289,6 +331,19 @@ namespace RadioPlayout.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Update an audio item in the database
+		/// </summary>
+		/// <param name="audioId">The AudioId of the item to change.</param>
+		/// <param name="artistName">The new Artist Name of the audio item.</param>
+		/// <param name="audioTitle">The new Audio Title of the audio item.</param>
+		/// <param name="audioLocation">The new direction where the new audio item has been uploaded to.</param>
+		/// <param name="audioDuration">The new audio duration of of the audio item.</param>
+		/// <param name="audioIn">The new time where the audio intro has ended for the new audio item.</param>
+		/// <param name="audioOut">The new time where the audio has ended for the audio item.</param>
+		/// <param name="audioReleaseYear">The new audio release year for the audio item.</param>
+		/// <param name="audioType">The new audio type id for the audio item.</param>
+		/// <returns></returns>
 		[HttpPost]
 		public ActionResult UpdateAudioItem(string audioId, string artistName, string audioTitle, string audioLocation, string audioDuration,
 			string audioIn, string audioOut, string audioReleaseYear, string audioType)
@@ -362,6 +417,10 @@ namespace RadioPlayout.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Called from a XHR request from a form input file. This will upload the files to /Content/Audio/Upload
+		/// </summary>
+		/// <returns></returns>
 		[HttpPost]
 		public ActionResult UploadAudioFile()
 		{
@@ -384,6 +443,11 @@ namespace RadioPlayout.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Get the Audio Item info from the Audio DB for a given audioId
+		/// </summary>
+		/// <param name="audioId">The AudioId to search for. This will be converted to an integer.</param>
+		/// <returns></returns>
 		[HttpPost]
 		public ActionResult GetAudioItemInfo(string audioId)
 		{
@@ -396,6 +460,49 @@ namespace RadioPlayout.Controllers
 			var audioItem = _db.Audio.Where(r => r.AudioId.Equals(audioIdInt));
 
 			return Json(audioItem);
+		}
+
+		/// <summary>
+		/// Delete a specified audio item from that Audio database.
+		/// </summary>
+		/// <param name="audioId">The AudioId of the item that needs to be deleted</param>
+		/// <returns></returns>
+		[HttpPost]
+		public ActionResult DeleteAudioItem(string audioId)
+		{
+			errorDict.Clear();
+			// AudioId placeholder when converting to an int
+			int audioIdInt = 0;
+			// Validate audio Id
+			if (String.IsNullOrWhiteSpace(audioId))
+			{
+				errorDict.Add("AudioItem", "There was an error deleting this audio item.");
+			}
+			else if(!Int32.TryParse(audioId, out audioIdInt))
+			{
+				errorDict.Add("AudioItem", "There was an error deleting this audio item");
+			}
+			
+			// Check whether any errors occured
+			if(errorDict.Count > 0)
+			{
+				Response.StatusCode = (int)HttpStatusCode.BadRequest;
+				return Json(errorDict);
+			}
+			else
+			{
+				// Remove the audio item based on the audioIdInt
+				var audioItems = _db.Audio.Where(r => r.AudioId.Equals(audioIdInt));
+				foreach (var audioItem in audioItems)
+				{
+					_db.Audio.Remove(audioItem);
+				}
+				_db.SaveChanges();
+
+				// Return state code 200
+				Response.StatusCode = (int)HttpStatusCode.OK;
+				return Json("Success");
+			}
 		}
 	}
 }

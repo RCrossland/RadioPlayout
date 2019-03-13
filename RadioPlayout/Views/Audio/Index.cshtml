@@ -3,7 +3,7 @@
 <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 
 <script src="https://unpkg.com/wavesurfer.js"></script>
-<script src="~/Scripts/Custom/AudioItems.js"></script>
+<script src="~/Scripts/Custom/audio_items.js"></script>
 @{
 	ViewBag.Title = "Index";
 	Layout = "~/Views/Shared/_Layout.cshtml";
@@ -14,7 +14,7 @@
 <div class="container-fluid">
 	<div class="row no-gutters">
 		<div class="col-8">
-			<div class="card">
+			<div class="card" id="audio_card_outer" data-delete-item="@Url.Action("DeleteAudioItem")">
 				<div class="card-header bg-dark text-white">
 					<div class="row">
 						<div class="col-8 d-flex align-items-center">Audio Catalogue</div>
@@ -54,14 +54,20 @@
 									<td>@item.AudioReleaseYear</td>
 									<td>@item.AudioType.AudioTypeName</td>
 									<td><i class="fas fa-pencil-alt pointer edit_audio_item" data-audio-id="@item.AudioId" data-get-audio="@Url.Action("GetAudioItemInfo")"></i></td>
-									<td><i class="fas fa-times pointer"></i></td>
+									<td><i class="fas fa-times pointer delete_audio_item" data-audio-id="@item.AudioId"></i></td>
 								</tr>
 							}
 						</tbody>
 					</table>
-					<div class="ml-3">
-						Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
-						@Html.PagedListPager(Model, page => Url.Action("Index", new { page, sortOrder = ViewBag.CurrentSort, currentSearchString = ViewBag.currentSearchString, currentAudioType = ViewBag.currentAudioType, currentAudioMinDuration = ViewBag.currentAudioMinDuration, currentAudioMaxDuration = ViewBag.currentAudioMaxDuration, currentAudioYear = ViewBag.currentAudioyear }))
+					<div class="row d-flex align-items-center">
+						<div class="col-4 ml-1">
+							Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+							@Html.PagedListPager(Model, page => Url.Action("Index", new { page, sortOrder = ViewBag.CurrentSort, currentSearchString = ViewBag.currentSearchString, currentAudioType = ViewBag.currentAudioType, currentAudioMinDuration = ViewBag.currentAudioMinDuration, currentAudioMaxDuration = ViewBag.currentAudioMaxDuration, currentAudioYear = ViewBag.currentAudioyear }))
+						</div>
+						<div class="col-7 d-flex justify-content-end">
+							<div class="text-success" id="autio_filter_success"></div>
+							<div class="text-danger" id="audio_filter_error"></div>
+						</div>
 					</div>
 				</div>
 			</div>
