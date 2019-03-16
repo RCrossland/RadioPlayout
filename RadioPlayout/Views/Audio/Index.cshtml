@@ -27,7 +27,6 @@
 					<table class="table table-hover">
 						<thead>
 							<tr>
-								<th scope="col"></th>
 								<th scope="col">
 									@Html.ActionLink("Artist Name", "Index", new { sortOrder = ViewBag.ArtistNameSortParam, currentFilter = ViewBag.CurrentFilter }, new { @class = "no_style" })
 								</th>
@@ -47,7 +46,6 @@
 							@foreach (var item in Model)
 							{
 								<tr>
-									<td class="text-center"><i class="fas fa-play pointer"></i></td>
 									<td>@item.ArtistName</td>
 									<td>@item.AudioTitle</td>
 									<td>@item.AudioDuration</td>
@@ -60,7 +58,7 @@
 						</tbody>
 					</table>
 					<div class="row d-flex align-items-center">
-						<div class="col-4 ml-1">
+						<div class="col-4 ml-3">
 							Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
 							@Html.PagedListPager(Model, page => Url.Action("Index", new { page, sortOrder = ViewBag.CurrentSort, currentSearchString = ViewBag.currentSearchString, currentAudioType = ViewBag.currentAudioType, currentAudioMinDuration = ViewBag.currentAudioMinDuration, currentAudioMaxDuration = ViewBag.currentAudioMaxDuration, currentAudioYear = ViewBag.currentAudioyear }))
 						</div>
