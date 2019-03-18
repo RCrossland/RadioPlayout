@@ -38,9 +38,9 @@
 						<div class="card-header bg-dark text-white">Current Clocks</div>
 						<div class="card-body pl-4 pr-4 pt-2">
 							<ul class="list-group list-group-flush">
-								<li class="list-group-item pointer">Clock 1</li>
-								<li class="list-group-item pointer">Clock 2</li>
-								<li class="list-group-item pointer">Clock 3</li>
+								<li class="list-group-item pointer no_select">Clock 1</li>
+								<li class="list-group-item pointer no_select">Clock 2</li>
+								<li class="list-group-item pointer no_select">Clock 3</li>
 							</ul>
 						</div>
 					</div>
@@ -53,51 +53,15 @@
 				<div class="card-header bg-dark text-white">
 					Create Schedule Clock
 				</div>
-				<div class="card-body p-0">
-					<div class="row no-gutters border border-dark p-2 pointer">
-						<div class="col-3">00:00:00</div>
-						<div class="col-9">80s Song A</div>
-					</div>
-					<div class="row no-gutters border border-dark p-2 pointer">
-						<div class="col-3">00:00:00</div>
-						<div class="col-9">80s Song A</div>
-					</div>
-					<div class="row no-gutters border border-dark p-2 pointer">
-						<div class="col-3">00:00:00</div>
-						<div class="col-9">80s Song A</div>
-					</div>
-					<div class="row no-gutters border border-dark p-2 pointer">
-						<div class="col-3">00:00:00</div>
-						<div class="col-9">80s Song A</div>
-					</div>
+				<div class="card-body p-0" id="schedule_clock_outer">
 				</div>
 			</div>
 		</div>
 		<div class="col-3">
-			<!--Area for select the new schedule clock items-->
+			<!--Area for selecting the new schedule clock items-->
 			<div class="card h-100">
 				<div class="card-header bg-dark text-white">Schedule Clock Items</div>
-				<div class="card-body p-0">
-					<div class="row no-gutters border border-dark p-2 pointer">
-						<div class="col-12">
-							80s Song A
-						</div>
-					</div>
-					<div class="row no-gutters border border-dark p-2 pointer">
-						<div class="col-12">
-							80s Song B
-						</div>
-					</div>
-					<div class="row no-gutters border border-dark p-2 pointer">
-						<div class="col-12">
-							80s Song C
-						</div>
-					</div>
-					<div class="row no-gutters border border-dark p-2 pointer">
-						<div class="col-12">
-							90s Song A
-						</div>
-					</div>
+				<div class="card-body p-0" id="schedule_audio_items_outer" data-url-get="@Url.Action("GetAudioType")">
 				</div>
 			</div>
 		</div>

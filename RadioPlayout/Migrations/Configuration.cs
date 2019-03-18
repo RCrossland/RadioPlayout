@@ -20,19 +20,23 @@ namespace RadioPlayout.Migrations
 			context.AudioType.AddOrUpdate(r => r.AudioTypeName,
 				new Models.AudioType
 				{
-					AudioTypeName = "song"
+					AudioTypeName = "song",
+					AudioAverageDuration = "180"
 				},
 				new Models.AudioType
 				{
-					AudioTypeName = "jingle"
+					AudioTypeName = "jingle",
+					AudioAverageDuration = "5"
 				},
 				new Models.AudioType
 				{
-					AudioTypeName = "bed"
+					AudioTypeName = "bed",
+					AudioAverageDuration = "180"
 				},
 				new Models.AudioType
 				{
-					AudioTypeName = "fx"
+					AudioTypeName = "fx",
+					AudioAverageDuration = "3"
 				}
 			);
 

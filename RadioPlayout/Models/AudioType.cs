@@ -9,5 +9,6 @@ namespace RadioPlayout.Models
 	{
 		public int AudioTypeId { get; set; }
 		public string AudioTypeName { get; set; }
+		public string AudioAverageDuration { get; set; }
 	}
 }
