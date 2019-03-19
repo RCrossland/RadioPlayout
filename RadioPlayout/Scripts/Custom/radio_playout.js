@@ -96,7 +96,7 @@ const radioPlayout = {
             s.radioPlayout2AudioRef.play();
         }),
 
-            $("#radio_player_2_pause").click(function (e) {
+        $("#radio_player_2_pause").click(function (e) {
                 s.radioPlayout2ElementSource.disconnect(s.radioPlayout2Analyser);
                 s.radioPlayout2Analyser.disconnect(s.radioPlayout2ScriptProcessor);
                 s.radioPlayout2ElementSource.disconnect(s.radioPlayout2AudioContext.destination);
