@@ -10,12 +10,13 @@
     },
     init: function () {
         scheduleClock.bindUIAction();
+        scheduleClock.findExistingScheduleClocks();
     },
     bindUIAction: function () {
         scheduleClock.settings.scheduleForm = $("#schedule_clock_form");
         scheduleClock.settings.scheduleFormSuccessRef = $("#schedule_clock_form_success");
         scheduleClock.settings.scheduleFormErrorRef = $("#schedule_clock_form_error");
-        scheduleClock.settings.scheduleFormNameRef = $("#schedule_clock_name_Ref")[0];
+        scheduleClock.settings.scheduleFormNameRef = $("#schedule_clock_name")[0];
         scheduleClock.settings.scheduleDurationRef = $("#schedule_clock_duration");
 
         $("#schedule_clock_outer").sortable({
@@ -84,6 +85,8 @@
 
         $("#schedule_clock_form").on("submit", function (e) {
             e.preventDefault();
+            // Stop the click propogating up the DOM
+            e.stopImmediatePropagation();
 
             if (scheduleClock.validateScheduleClockForm()) {
                 scheduleClock.submitScheduleClock();
@@ -120,7 +123,10 @@
         let date = new Date(null);
         date.setSeconds(currentTime);
 
-        $("#schedule_clock_duration").attr("value", date.toISOString().substr(11, 8));
+        scheduleClock.settings.scheduleDurationRef.attr("value", date.toISOString().substr(11, 8));
+
+        // Set the data attribute to the duration in seconds
+        scheduleClock.settings.scheduleDurationRef.attr("data-seconds", currentTime);
     },
     addNewScheduleClockItem: function (ui) {
         if (ui.item.index() == 0) {
@@ -226,6 +232,10 @@
 
             return false;
         }
+        else if (scheduleClock.settings.scheduleClockList.length == 0) {
+            scheduleClock.settings.scheduleFormSuccessRef("");
+            scheduleClock.settings.scheduleFormErrorRef("Please add items to the schedule clock.");
+        }
         else {
             scheduleClock.settings.scheduleFormSuccessRef.text("");
             scheduleClock.settings.scheduleFormErrorRef.text("");
@@ -233,23 +243,100 @@
             return true;
         }
     },
-    //submitScheduleClock: function () {
-    //    // This should only run if the form has been validated
-    //    $.ajax({
-    //        type: "POST",
-    //        url:,
-    //        data: {
-    //            "schedule_clock_name": scheduleClock.settings.scheduleFormNameRef.value,
-    //            "schedule_clock_duration": scheduleClock.settings.scheduleDurationRef.value
-    //        },
-    //        success: function () {
-    //            console.log("Form was successful");
-    //        },
-    //        error: function (jqXHR, textStatus, errorThrown) {
-    //            console.log("An error occured");
-    //        }
-    //    });
-    //},
+    findExistingScheduleClocks: function () {
+        $.ajax({
+            type: "POST",
+            url: $("#current_schedule_clocks").data("url"),
+            success: function (scheduleClocks) {
+                scheduleClock.displayScheduleClocks(scheduleClocks);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR.responseText);
+                $("#current_schedule_clocks").text(jqXHR.responseText);
+            }
+        });
+    },
+    displayScheduleClocks: function (scheduleClocks) {
+        // Check the length of the schedule clocks
+        // If the length is 0 output an error to the user
+        if (scheduleClocks.length == 0) {
+            $("#current_schedule_clocks").text("There are currently no existing schedule clocks.");
+        }
+        else {
+            let scheduleClockHTML = "";
+
+            $.each(scheduleClocks, function (index, value) {
+                scheduleClockHTML = scheduleClockHTML + "<li class=\"list-group-item pointer no_select existing_schedule_clock\">" + value.ScheduleClockName + "</li>";
+            });
+
+            // Append the HTML to the page and attach a click event handler
+            $("#current_schedule_clocks").append(scheduleClockHTML);
+            $(".existing_schedule_clock").click(function (e) {
+                e.stopImmediatePropagation();
+
+                scheduleClock.getSpecifiedScheduleClock($(this).text());
+            });
+        }
+    },
+    getSpecifiedScheduleClock: function (scheduleClockName) {
+        $.ajax({
+            type: "POST",
+            url: $("#schedule_clock_outer").data("find"),
+            data: { "scheduleClockName": scheduleClockName },
+            success: function (scheduleClockItems) {
+                scheduleClock.populateScheduleClock(scheduleClockName, scheduleClockItems);
+            },
+            error: function (jqXHR, textStatus, errorThrown){
+                console.log(jqXHR.responseText);
+            }
+        });
+    },
+    populateScheduleClock: function (scheduleClockName, scheduleClockItems) {
+        let scheduleClockItemsHTML = "";
+
+        // Empty the current schedule clock list
+        scheduleClock.settings.scheduleClockList = []
+
+        // Loop over the schedule clock items and output them to the page
+        $.each(scheduleClockItems, function (index, value) {
+            scheduleClockItemsHTML = scheduleClockItemsHTML + "<div class=\"row no-gutters border border-dark p-2 pointer no_select schedule_clock_item\">" +
+                "<div class=\"col-3 schedule_clock_item_duration\" data-duration=\"" + value.AudioType.AudioAverageDuration + "\">00:00:00</div>" + 
+                "<div class=\"col-8\">" + value.AudioType.AudioTypeName + "</div>" + 
+                "<div class=\"col-1 schedule_clock_item_remove\"><i class=\"fas fa-times\"></i></div>" + 
+                "</div>";
+
+            scheduleClock.settings.scheduleClockList.push({
+                "schedule_clock_index": index + 1,
+                "schedule_clock_name": value.AudioType.AudioTypeName
+            });
+        });
+
+        // Empty the schedule clock outer and output the new HTML
+        $("#schedule_clock_outer").empty().append(scheduleClockItemsHTML);
+        scheduleClock.calculateScheduleItemsDuration();    
+
+        // Set the name of the Schedule Clock
+        $("#schedule_clock_name").val(scheduleClockName);
+    },
+    submitScheduleClock: function () {
+        // This should only run if the form has been validated
+        $.ajax({
+            type: "POST",
+            url: $("#schedule_clock_form").data("submit"),
+            data: {
+                "scheduleClockItemInputs": JSON.stringify(scheduleClock.settings.scheduleClockList),
+                "scheduleClockName": $("#schedule_clock_name").val(),
+                "scheduleClockDuration": $("#schedule_clock_duration").data("seconds")
+            },
+            success: function () {
+                scheduleClock.settings.scheduleFormSuccessRef.text("Schedule item was successfully added.");
+                scheduleClock.settings.scheduleFormErrorRef.text("");
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log("An error occured");
+            }
+        });
+    },
     stripInput: function (data) {
 
     }
@@ -294,6 +381,6 @@ let audioItems = {
 }
 
 $(document).ready(function () {
-    scheduleClock.init();
     audioItems.init();
+    scheduleClock.init();
 });

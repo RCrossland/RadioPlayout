@@ -16,5 +16,7 @@ namespace RadioPlayout.Models
 		public DbSet<AudioType> AudioType { get; set; }
 		public DbSet<Audio> Audio { get; set; }
 		public DbSet<ScheduleItems> ScheduleItems { get; set; }
+		public DbSet<ScheduleClock> ScheduleClock { get; set; }
+		public DbSet<ScheduleClockItem> ScheduleClockItems { get; set; }
 	}
 }

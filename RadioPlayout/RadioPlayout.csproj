@@ -154,6 +154,8 @@
     <Compile Include="Models\AudioType.cs" />
     <Compile Include="Models\RadioPlayoutDb.cs" />
     <Compile Include="Models\Schedule.cs" />
+    <Compile Include="Models\ScheduleClock.cs" />
+    <Compile Include="Models\ScheduleClockItem.cs" />
     <Compile Include="Models\ScheduleItems.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

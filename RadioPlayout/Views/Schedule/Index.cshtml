@@ -17,10 +17,10 @@
 					<div class="card h-100">
 						<div class="card-header bg-dark text-white">Clock Information</div>
 						<div class="card-body pl-4 pr-4 pt-2">
-							<form method="post" id="schedule_clock_form">
+							<form method="post" id="schedule_clock_form" data-submit="@Url.Action("SubmitScheduleClock")">
 								<div class="form-group">
-									<label for="schedule_clock_name_Ref">Clock Name</label>
-									<input type="text" class="form-control" id="schedule_clock_name_Ref" name="schedule_clock_name_Ref" />
+									<label for="schedule_clock_name">Clock Name</label>
+									<input type="text" class="form-control" id="schedule_clock_name" name="schedule_clock_name" />
 								</div>
 								<div class="form-group">
 									<label for="schedule_clock_duration">Clock Average Duration</label>
@@ -39,10 +39,7 @@
 					<div class="card h-100">
 						<div class="card-header bg-dark text-white">Current Clocks</div>
 						<div class="card-body pl-4 pr-4 pt-2">
-							<ul class="list-group list-group-flush">
-								<li class="list-group-item pointer no_select">Clock 1</li>
-								<li class="list-group-item pointer no_select">Clock 2</li>
-								<li class="list-group-item pointer no_select">Clock 3</li>
+							<ul class="list-group list-group-flush" id="current_schedule_clocks" data-url="@Url.Action("GetExistingScheduleClocks")">
 							</ul>
 						</div>
 					</div>
@@ -55,7 +52,7 @@
 				<div class="card-header bg-dark text-white">
 					Create Schedule Clock
 				</div>
-				<div class="card-body p-0" id="schedule_clock_outer">
+				<div class="card-body p-0 pre-scrollable h-100" id="schedule_clock_outer" data-find="@Url.Action("GetSpecificScheduleClockItems")">
 				</div>
 			</div>
 		</div>
