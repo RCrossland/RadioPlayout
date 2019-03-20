@@ -9,6 +9,7 @@ using System.Net;
 
 namespace RadioPlayout.Controllers
 {
+	[Authorize]
     public class ScheduleController : Controller
     {
 		private RadioPlayoutDb _db = new RadioPlayoutDb();

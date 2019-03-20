@@ -1,0 +1,87 @@
+﻿
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Left Navigation Panel -->
+<div class="left_navigation">
+	<div class="container-fluid">
+		<div class="left_navigation_branding">
+			<a class="navbar-brand left_navigation_logo float-left" href="@Url.Action("Index", "Audio")">
+				Click My Radio
+			</a>
+			<i class="fas fa-bars navigation_toggler pointer"></i>
+			@Html.Partial("_LoginPartial")
+		</div>
+
+		<hr class="navbar-divider">
+
+		<div class="navigation_outer">
+			<div class="left_navigation_user d-flex align-items-center">
+				<div class="left_navigation_user_image float-left">
+					<img src="http://icons.iconarchive.com/icons/paomedia/small-n-flat/512/user-male-icon.png" alt="">
+				</div>
+				<div class="left_navigation_user_details float-right">
+					Welcome, <br>
+					Greg James
+				</div>
+			</div>
+
+			<hr class="navbar-divider">
+
+			<ul class="left_navigation_list navbar-nav">
+				<li class="navbar-item left_navigation_list_item">
+					<a href="#" class="left_navigation_list_item_link left_navigation_list_item_active">
+						<i class="fas fa-tachometer-alt left_navigation_list_item_icon"></i> Dashboard
+					</a>
+				</li>
+				<li class="navbar-item left_navigation_list_item">
+					<a href="@Url.Action("Index", "Schedule")" class="left_navigation_list_item_link">
+						<i class="fas fa-calendar-alt left_navigation_list_item_icon"></i> Schedule
+					</a>
+				</li>
+				<li class="navbar-item left_navigation_list_item">
+					<a href="@Url.Action("Index", "Audio")" class="left_navigation_list_item_link">
+						<i class="fas fa-music left_navigation_list_item_icon"></i> Music Catalogue
+					</a>
+				</li>
+				<li class="navbar-item left_navigation_list_item">
+
+					<a href="@Url.Action("Index", "RadioPlayer")" class="left_navigation_list_item_link">
+						<i class="fas fa-microphone left_navigation_list_item_icon"></i> Radio Playout
+					</a>
+				</li>
+				<li class="navbar-item left_navigation_list_item">
+					<a href="#" class="left_navigation_list_item_link">
+						<i class="fas fa-user left_navigation_list_item_icon"></i> My Account
+					</a>
+				</li>
+			</ul>
+
+			<hr class="navbar-divider">
+		</div>
+	</div>
+</div>
+
+<!-- Top Navigation Panel -->
+<div class="top_navigation">
+	<div class="top_navigation_content float-right d-flex align-items-center">
+		<div class="top_navigation_switch_outer">
+			<i class="fas fa-toggle-on auto_dj_switch pointer fa-rotate-180"></i> <span class="auto_dj_switch_text">Auto DJ</span>
+		</div>
+
+		<div class="vl float-left"></div>
+
+		<div class="top_navigation_date float-right">
+			<ul class="top_navigation_date_list list-unstyled text-white">
+				<li id="date_ref"></li>
+				<li id="time_ref"></li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<!-- Main Content -->
+<div class="main_content mt-2">
+	@RenderBody()
+</div>

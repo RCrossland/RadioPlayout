@@ -11,6 +11,7 @@ using System.Web.Hosting;
 
 namespace RadioPlayout.Controllers
 {
+	[Authorize]
     public class AudioController : Controller
     {
 		private RadioPlayoutDb _db = new RadioPlayoutDb();

@@ -8,6 +8,7 @@ using System.Web.Mvc;
 
 namespace RadioPlayout.Controllers
 {
+	[Authorize]
     public class RadioPlayerController : Controller
     {
 		private RadioPlayoutDb _db = new RadioPlayoutDb();
