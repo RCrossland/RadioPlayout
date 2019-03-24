@@ -43,9 +43,21 @@
 					</a>
 				</li>
 				<li class="navbar-item left_navigation_list_item">
-					<a href="@Url.Action("Index", "Schedule")" class="left_navigation_list_item_link" id="nav-schedule">
+					<a href="#" class="left_navigation_list_item_link left_navigation_dropdown_toggle" id="nav-schedule">
 						<i class="fas fa-calendar-alt left_navigation_list_item_icon"></i> Schedule
 					</a>
+					<ul class="left_navigation_list navbar-nav left_navigation_dropdown text-white mt-0 d-none">
+						<li class="navbar-item left_navigation_list_item">
+							<a href="#" class="left_navigation_list_item_link">
+								Schedule Calendar
+							</a>
+						</li>
+						<li class="navbar-item left_navigation_list_item">
+							<a href="@Url.Action("Index", "Schedule")" class="left_navigation_list_item_link">
+								Schedule Clock
+							</a>
+						</li>
+					</ul>
 				</li>
 				<li class="navbar-item left_navigation_list_item">
 					<a href="@Url.Action("Index", "Audio")" class="left_navigation_list_item_link" id="nav-catalogue">
@@ -59,9 +71,25 @@
 					</a>
 				</li>
 				<li class="navbar-item left_navigation_list_item">
-					<a href="#" class="left_navigation_list_item_link" id="nav-account">
+					<a href="#" class="left_navigation_list_item_link left_navigation_dropdown_toggle" id="nav-schedule">
 						<i class="fas fa-user left_navigation_list_item_icon"></i> My Account
 					</a>
+					<ul class="left_navigation_list navbar-nav left_navigation_dropdown text-white mt-0 d-none">
+						<li class="navbar-item left_navigation_list_item">
+							<a href="#" class="left_navigation_list_item_link">
+								Edit My Account
+							</a>
+						</li>
+						<li class="navbar-item left_navigation_list_item">
+							@using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+							{
+							@Html.AntiForgeryToken()
+								<a href="javascript:document.getElementById('logoutForm').submit()" class="left_navigation_list_item_link">
+									Logout
+								</a>
+							}
+						</li>
+					</ul>
 				</li>
 			</ul>
 

@@ -107,6 +107,10 @@
 	margin-top: 1em;
 }
 
+.left_navigation_dropdown {
+	background-color: #EBEBED;
+}
+
 .left_navigation_list_item_link {
 	display: block;
 	color: #000000;
@@ -114,11 +118,11 @@
 	padding: 0.5em 0.25em 0.5em 0.5em;
 }
 
-	.left_navigation_list_item_link:hover {
-		color: #000000;
-		background-color: #EBEBED;
-		text-decoration: none;
-	}
+.left_navigation_list_item_link:hover {
+	color: #000000;
+	background-color: #EBEBED;
+	text-decoration: none;
+}
 
 .left_navigation_list_item_active {
 	background-color: #EBEBED;

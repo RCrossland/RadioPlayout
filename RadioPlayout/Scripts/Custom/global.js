@@ -18,12 +18,13 @@
                 $(".navigation_outer").css("display", "none");
             }
         });
+
+        $(".left_navigation_dropdown_toggle").click(function (e) {
+            leftNavigation.dropdownToggle($(this));
+        });
     },
     toggleNavActive: function () {
         let activeNav = $(".left_navigation_list").data("current");
-
-        console.log("Navigation");
-        console.log(activeNav);
 
         if (activeNav == "Dashboard") {
             $("#nav-dashboard").addClass("left_navigation_list_item_active");
@@ -39,6 +40,24 @@
         }
         else if (activeNav == "My Account") {
             $("#nav-account").addClass("left_navigation_list_item_active");
+        }
+    },
+    resetDropdownToggle: function () {
+        // Set the background-color back to white
+        $(".left_navigation_dropdown_toggle").css("background-color", "#FFFFFF");
+        $(".left_navigation_dropdown").addClass("d-none");
+    },
+    dropdownToggle: function (reference) {
+        leftNavigation.resetDropdownToggle();
+
+        // Show the dropdown menu
+        if ($(reference).next(".left_navigation_dropdown").hasClass("d-none")) {
+            $(reference).css("background-color", "#EBEBED");
+            $(reference).next(".left_navigation_dropdown").removeClass("d-none");
+        }
+        else {
+            $(reference).css("background-color", "#FFFFFF");
+            $(reference).next(".left_navigation_dropdown").addClass("d-none");
         }
     }
 };
@@ -87,8 +106,6 @@ let topNavigation = {
         $("#time_ref").empty().append(generatedTimeHTML);
     }
 };
-
-
 
 $(document).ready(function () {
     leftNavigation.init();
