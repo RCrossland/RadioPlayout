@@ -212,6 +212,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\Custom\audio_items.js" />
+    <Content Include="Scripts\Custom\dashboard.js" />
     <Content Include="Scripts\Custom\global.js" />
     <Content Include="Scripts\Custom\radio_playout.js" />
     <Content Include="Scripts\Custom\schedule_clocks.js" />

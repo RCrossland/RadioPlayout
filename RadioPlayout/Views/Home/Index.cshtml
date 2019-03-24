@@ -3,6 +3,11 @@
 	Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
+@section scripts
+{
+	<script src="~/Scripts/Custom/dashboard.js"></script>
+}
+
 <div class="ml-2 mr-2">
 	<div class="row no-gutters mt-sm-3 mt-md-4 justify-content-center">
 		<div class="ml-1 mr-1 ml-lg-0 bg-success stationInfoCard"></div>
@@ -73,7 +78,7 @@
 		<div class="col-lg-3 mt-2 mt-sm-0 stationInfoLongCard stationWeatherCard">
 			<div class="card h-100">
 				<div class="card-header bg-dark text-light">
-					Local Weather
+					Local Weather - Leeds
 				</div>
 				<div class="card-body p-0">
 					<div class="card weatherContentCards">

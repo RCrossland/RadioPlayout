@@ -56,13 +56,18 @@
 						</div>
 					</div>
 					<div class="form-row">
-						<div class="col-4">
+						<div class="col-6 col-lg-4">
 							<div>Upload Audio File</div>
-							<input type="file" class="form-control" id="audio_file_upload" data-file-name="" data-upload-url="@Url.Action("UploadAudioFile")"/>
+							<input type="file" class="form-control" id="audio_file_upload" data-file-name="" data-upload-url="@Url.Action("UploadAudioFile")" />
 						</div>
-						<div class="col-8">
+						<div class="col-6 d-lg-none">
+							<div>Track Duration</div>
+							<input type="text" class="form-control" name="audioDuration" id="audio_duration" value="00:00:00" readonly>
+							<div class="text-danger audio_error" id="audio_duration_error"></div>
+						</div>
+						<div class="col-12 col-lg-8">
 							<div class="form-row">
-								<div class="col-4">
+								<div class="col-6 col-lg-4">
 									<div>Track In</div>
 									<div class="input-group">
 										<div class="input-group-prepend">
@@ -72,7 +77,7 @@
 										<div class="text-danger audio_error" id="audio_in_error"></div>
 									</div>
 								</div>
-								<div class="col-4">
+								<div class="col-6 col-lg-4">
 									<div>Track Out</div>
 									<div class="input-group">
 										<div class="input-group-prepend">
@@ -82,7 +87,7 @@
 										<div class="text-danger audio_error" id="audio_out_error"></div>
 									</div>
 								</div>
-								<div class="col-4">
+								<div class="col-4 d-none d-lg-block">
 									<div>Track Duration</div>
 									<input type="text" class="form-control" name="audioDuration" id="audio_duration" value="00:00:00" readonly>
 									<div class="text-danger audio_error" id="audio_duration_error"></div>

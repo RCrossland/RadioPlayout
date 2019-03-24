@@ -7,6 +7,17 @@
     },
     bindUIElements: function () {
         leftNavigation.toggleNavActive();
+
+        $(".navigation_toggler").click(function () {
+            if ($(this).hasClass("fa-bars")) {
+                $(this).removeClass("fa-bars").addClass("fa-times");
+                $(".navigation_outer").css("display", "block");
+            }
+            else {
+                $(this).removeClass("fa-times").addClass("fa-bars");
+                $(".navigation_outer").css("display", "none");
+            }
+        });
     },
     toggleNavActive: function () {
         let activeNav = $(".left_navigation_list").data("current");
