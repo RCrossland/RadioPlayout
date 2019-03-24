@@ -8,13 +8,14 @@ using PagedList;
 using System.Net;
 using System.IO;
 using System.Web.Hosting;
+using Microsoft.AspNet.Identity;
 
 namespace RadioPlayout.Controllers
 {
 	[Authorize]
     public class AudioController : Controller
     {
-		private RadioPlayoutDb _db = new RadioPlayoutDb();
+		private ApplicationDbContext _db = new ApplicationDbContext();
 		private readonly string uploadAudioDirectory = HostingEnvironment.MapPath("~/Content/Audio/Upload/");
 		private readonly string audioDirectory = HostingEnvironment.MapPath("~/Content/Audio/");
 		private Dictionary<string, string> errorDict = new Dictionary<string, string>();
@@ -39,7 +40,12 @@ namespace RadioPlayout.Controllers
 		/// <returns></returns>
 		public ViewResult Index(string sortOrder, string searchString, string currentSearchString, string audioType, string currentAudioType, string audioMinDuration, 
 			string currentAudioMinDuration, string audioMaxDuration, string currentAudioMaxDuration, string audioYear, string currentAudioYear, int? page)
-        {
+		{
+			// Get user details
+			string currentUserId = User.Identity.GetUserId();
+			ApplicationUser currentUser = _db.Users.FirstOrDefault(x => x.Id == currentUserId);
+			ViewBag.UserName = currentUser.FirstName + " " + currentUser.LastName;
+
 			ViewBag.CurrentSort = sortOrder;
 			ViewBag.ArtistNameSortParam = sortOrder == "artist_name" ? "artist_name_desc" : "artist_name";
 			ViewBag.AudioTitleSortParam = sortOrder == "audio_title" ? "audio_title_desc" : "audio_title";

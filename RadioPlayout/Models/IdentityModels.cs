@@ -10,6 +10,9 @@ namespace RadioPlayout.Models
 	// You can add profile data for the user by adding more properties to your ApplicationUser class, please visit https://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
 	public class ApplicationUser : IdentityUser
 	{
+		public string FirstName { get; set; }
+		public string LastName { get; set; }
+
 		public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
 		{
 			// Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
@@ -22,7 +25,7 @@ namespace RadioPlayout.Models
 	public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 	{
 		public ApplicationDbContext()
-			: base("DefaultConnection", throwIfV1Schema: false)
+			: base("name=DefaultConnection", throwIfV1Schema: false)
 		{
 		}
 
@@ -30,5 +33,12 @@ namespace RadioPlayout.Models
 		{
 			return new ApplicationDbContext();
 		}
+
+		public DbSet<Schedule> Schedule { get; set; }
+		public DbSet<AudioType> AudioType { get; set; }
+		public DbSet<Audio> Audio { get; set; }
+		public DbSet<ScheduleItems> ScheduleItems { get; set; }
+		public DbSet<ScheduleClock> ScheduleClock { get; set; }
+		public DbSet<ScheduleClockItem> ScheduleClockItems { get; set; }
 	}
 }

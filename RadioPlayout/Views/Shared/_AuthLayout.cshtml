@@ -1,6 +1,11 @@
-﻿
+﻿@using Microsoft.AspNet.Identity
 @{
 	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section scripts
+{
+	@RenderSection("scripts", required: false)
 }
 
 <!-- Left Navigation Panel -->
@@ -18,12 +23,14 @@
 
 		<div class="navigation_outer">
 			<div class="left_navigation_user d-flex align-items-center">
-				<div class="left_navigation_user_image float-left">
-					<img src="http://icons.iconarchive.com/icons/paomedia/small-n-flat/512/user-male-icon.png" alt="">
-				</div>
-				<div class="left_navigation_user_details float-right">
-					Welcome, <br>
-					Greg James
+				<div class="row">
+					<div class="left_navigation_user_image col-6 float-left">
+						<img src="http://icons.iconarchive.com/icons/paomedia/small-n-flat/512/user-male-icon.png" alt="">
+					</div>
+					<div class="left_navigation_user_details col-6 float-right pr-0">
+						Welcome, <br>
+						@ViewBag.UserName
+					</div>
 				</div>
 			</div>
 

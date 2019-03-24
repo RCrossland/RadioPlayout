@@ -1,4 +1,5 @@
-﻿using RadioPlayout.Models;
+﻿using Microsoft.AspNet.Identity;
+using RadioPlayout.Models;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -11,11 +12,16 @@ namespace RadioPlayout.Controllers
 	[Authorize]
     public class RadioPlayerController : Controller
     {
-		private RadioPlayoutDb _db = new RadioPlayoutDb();
+		private ApplicationDbContext _db = new ApplicationDbContext();
 
         // GET: RadioPlayer
         public ActionResult Index()
         {
+			// Get user details
+			string currentUserId = User.Identity.GetUserId();
+			ApplicationUser currentUser = _db.Users.FirstOrDefault(x => x.Id == currentUserId);
+			ViewBag.UserName = currentUser.FirstName + " " + currentUser.LastName;
+
 			dynamic model = new ExpandoObject();
 
 			model.ScheduleItems = from scheduleItem in _db.ScheduleItems

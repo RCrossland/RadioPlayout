@@ -5,18 +5,19 @@ namespace RadioPlayout.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<RadioPlayout.Models.RadioPlayoutDb>
+    internal sealed class Configuration : DbMigrationsConfiguration<RadioPlayout.Models.ApplicationDbContext>
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = true;
-            ContextKey = "RadioPlayout.Models.RadioPlayoutDb";
+            AutomaticMigrationsEnabled = false;
         }
 
-		protected override void Seed(RadioPlayout.Models.RadioPlayoutDb context)
-		{
+        protected override void Seed(RadioPlayout.Models.ApplicationDbContext context)
+        {
 			//  This method will be called after migrating to the latest version.
-			// Set the Audio Type Values
+
+			//  You can use the DbSet<T>.AddOrUpdate() helper extension method 
+			//  to avoid creating duplicate seed data.
 			context.AudioType.AddOrUpdate(r => r.AudioTypeName,
 				new Models.AudioType
 				{
@@ -41,7 +42,8 @@ namespace RadioPlayout.Migrations
 			);
 
 			context.Audio.AddOrUpdate(r => r.ArtistName,
-				new Models.Audio {
+				new Models.Audio
+				{
 					ArtistName = "Olly Murs",
 					AudioTitle = "Excuses",
 					AudioLocation = "/Content/Audio/Olly Murs - Excuses.wav",
@@ -61,6 +63,6 @@ namespace RadioPlayout.Migrations
 					AudioReleaseYear = 2017
 				}
 			);
-        }
+		}
     }
 }

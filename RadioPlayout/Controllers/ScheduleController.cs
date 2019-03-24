@@ -6,18 +6,24 @@ using System.Web;
 using System.Web.Mvc;
 using Newtonsoft.Json;
 using System.Net;
+using Microsoft.AspNet.Identity;
 
 namespace RadioPlayout.Controllers
 {
 	[Authorize]
     public class ScheduleController : Controller
     {
-		private RadioPlayoutDb _db = new RadioPlayoutDb();
+		private ApplicationDbContext _db = new ApplicationDbContext();
 
 		// GET: ScheduleClock
 		public ActionResult Index()
         {
-            return View();
+			// Get user details
+			string currentUserId = User.Identity.GetUserId();
+			ApplicationUser currentUser = _db.Users.FirstOrDefault(x => x.Id == currentUserId);
+			ViewBag.UserName = currentUser.FirstName + " " + currentUser.LastName;
+
+			return View();
         }
 
 		[HttpPost]

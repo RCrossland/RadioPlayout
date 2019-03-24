@@ -184,9 +184,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201902261245066_InitialCreate.cs" />
-    <Compile Include="Migrations\201902261245066_InitialCreate.Designer.cs">
-      <DependentUpon>201902261245066_InitialCreate.cs</DependentUpon>
+    <Compile Include="Migrations\201903231407294_Initial.cs" />
+    <Compile Include="Migrations\201903231407294_Initial.Designer.cs">
+      <DependentUpon>201903231407294_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -194,7 +194,6 @@
     <Compile Include="Models\AudioType.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
-    <Compile Include="Models\RadioPlayoutDb.cs" />
     <Compile Include="Models\Schedule.cs" />
     <Compile Include="Models\ScheduleClock.cs" />
     <Compile Include="Models\ScheduleClockItem.cs" />
@@ -207,6 +206,7 @@
     <Content Include="Content\Audio\Olly Murs - Excuses.wav" />
     <Content Include="Content\CSS\Custom\main.css" />
     <Content Include="Content\CSS\Custom\responsive.css" />
+    <Content Include="Content\Images\Login\Radio-Background.jpg" />
     <Content Include="Content\PagedList.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -269,8 +269,8 @@
     <None Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201902261245066_InitialCreate.resx">
-      <DependentUpon>201902261245066_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201903231407294_Initial.resx">
+      <DependentUpon>201903231407294_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

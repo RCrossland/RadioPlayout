@@ -27,6 +27,24 @@
 	text-decoration: none;
 }
 
+/* Login */
+#login_header{
+	text-align: center;
+}
+
+#login_outer {
+	padding-top: 35%;
+	width: 75%;
+}
+
+#login_image {
+	background: url("/Content/Images/Login/Radio-Background.jpg");
+	background-color: #000000;
+	background-position: center;
+	background-repeat: no-repeat; 
+	background-size: cover;
+}
+
 /* Left Navigation */
 .left_navigation {
 	position: relative;
@@ -75,21 +93,19 @@
 	height: 5em;
 }
 
-	.left_navigation_user_image img {
-		border-radius: 50%;
-		width: 100%;
-		height: 100%;
-	}
+.left_navigation_user_image img {
+	border-radius: 50%;
+	width: 100%;
+	height: 100%;
+}
 
 .left_navigation_user_details {
-	margin-left: 1em;
+	word-wrap: break-word;
 }
 
 .left_navigation_list {
 	margin-top: 1em;
 }
-
-
 
 .left_navigation_list_item_link {
 	display: block;
