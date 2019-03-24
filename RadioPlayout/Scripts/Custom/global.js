@@ -6,16 +6,29 @@
         leftNavigation.bindUIElements();
     },
     bindUIElements: function () {
-        $(".navigation_toggler").click(function () {
-            if ($(this).hasClass("fa-bars")) {
-                $(this).removeClass("fa-bars").addClass("fa-times");
-                $(".navigation_outer").css("display", "block");
-            }
-            else {
-                $(this).removeClass("fa-times").addClass("fa-bars");
-                $(".navigation_outer").css("display", "none");
-            }
-        });
+        leftNavigation.toggleNavActive();
+    },
+    toggleNavActive: function () {
+        let activeNav = $(".left_navigation_list").data("current");
+
+        console.log("Navigation");
+        console.log(activeNav);
+
+        if (activeNav == "Dashboard") {
+            $("#nav-dashboard").addClass("left_navigation_list_item_active");
+        }
+        else if (activeNav == "Schedule") {
+            $("#nav-schedule").addClass("left_navigation_list_item_active");
+        }
+        else if (activeNav == "Music Catalogue") {
+            $("#nav-catalogue").addClass("left_navigation_list_item_active");
+        }
+        else if (activeNav == "Radio Playout") {
+            $("#nav-playout").addClass("left_navigation_list_item_active");
+        }
+        else if (activeNav == "My Account") {
+            $("#nav-account").addClass("left_navigation_list_item_active");
+        }
     }
 };
 
