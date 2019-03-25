@@ -58,6 +58,25 @@ namespace RadioPlayout.Models
 		public string ConfirmPassword { get; set; }
 	}
 
+	public class EditDetailsViewModel
+	{
+		[Required]
+		[DataType(DataType.Text)]
+		[Display(Name = "First Name")]
+		public string FirstName { get; set; }
+		
+		[Required]
+		[DataType(DataType.Text)]
+		[Display(Name = "Last Name")]
+		public string LastName { get; set  ; }
+
+		[Required]
+		[EmailAddress]
+		[DataType(DataType.EmailAddress)]
+		[Display(Name = "Email")]
+		public string Email { get; set; }
+	}
+
 	public class AddPhoneNumberViewModel
 	{
 		[Required]

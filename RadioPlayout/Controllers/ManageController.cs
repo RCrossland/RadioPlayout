@@ -56,16 +56,14 @@ namespace RadioPlayout.Controllers
 		public async Task<ActionResult> Index(ManageMessageId? message)
 		{
 			// Get user details
-			string currentUserId = User.Identity.GetUserId();
-			ApplicationUser currentUser = _db.Users.FirstOrDefault(x => x.Id == currentUserId);
-			ViewBag.UserName = currentUser.FirstName + " " + currentUser.LastName;
+			GetUserName();
 
 			ViewBag.StatusMessage =
 				message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
 				: message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
 				: message == ManageMessageId.SetTwoFactorSuccess ? "Your two-factor authentication provider has been set."
-				: message == ManageMessageId.Error ? "An error has occurred."
 				: message == ManageMessageId.AddPhoneSuccess ? "Your phone number was added."
+				: message == ManageMessageId.EditDetailsSuccess ? "Your details were updated successfully."
 				: message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
 				: "";
 
@@ -234,7 +232,10 @@ namespace RadioPlayout.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				return View(model);
+				// Get user details
+				GetUserName();
+
+				return View("~/Views/Manage/Index.cshtml");
 			}
 			var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
 			if (result.Succeeded)
@@ -244,10 +245,51 @@ namespace RadioPlayout.Controllers
 				{
 					await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 				}
-				return RedirectToAction("Index", new { Message = ManageMessageId.ChangePasswordSuccess });
+				return RedirectToAction("Index", "Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
 			}
 			AddErrors(result);
-			return View(model);
+
+			// Get user details
+			GetUserName();
+
+			return View("~/Views/Manage/Index.cshtml");
+		}
+
+		//
+		// POST: /Manage/EditDetails
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<ActionResult> EditDetails(EditDetailsViewModel model)
+		{
+			if (!ModelState.IsValid)
+			{
+				// Get user details
+				GetUserName();
+
+				return View("~/Views/Manage/Index.cshtml");
+			}
+
+			var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+
+			if (user != null)
+			{
+				user.FirstName = model.FirstName;
+				user.LastName = model.LastName;
+				user.UserName = model.Email;
+				user.Email = model.Email;
+
+				var result = await UserManager.UpdateAsync(user);
+
+				if (result.Succeeded)
+				{
+					return RedirectToAction("Index", "Manage", new { Message = ManageMessageId.EditDetailsSuccess });
+				}
+
+				AddErrors(result);
+			}
+
+			GetUserName();
+			return View("~/Views/Manage/Index.cshtml");
 		}
 
 		//
@@ -387,7 +429,16 @@ namespace RadioPlayout.Controllers
 			SetPasswordSuccess,
 			RemoveLoginSuccess,
 			RemovePhoneSuccess,
+			EditDetailsSuccess,
 			Error
+		}
+
+		public void GetUserName()
+		{
+			// Get user details
+			string currentUserId = User.Identity.GetUserId();
+			ApplicationUser currentUser = _db.Users.FirstOrDefault(x => x.Id == currentUserId);
+			ViewBag.UserName = currentUser.FirstName + " " + currentUser.LastName;
 		}
 
 		#endregion
