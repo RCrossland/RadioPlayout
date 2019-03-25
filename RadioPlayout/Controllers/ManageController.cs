@@ -13,6 +13,7 @@ namespace RadioPlayout.Controllers
 	[Authorize]
 	public class ManageController : Controller
 	{
+		private ApplicationDbContext _db = new ApplicationDbContext();
 		private ApplicationSignInManager _signInManager;
 		private ApplicationUserManager _userManager;
 
@@ -54,6 +55,11 @@ namespace RadioPlayout.Controllers
 		// GET: /Manage/Index
 		public async Task<ActionResult> Index(ManageMessageId? message)
 		{
+			// Get user details
+			string currentUserId = User.Identity.GetUserId();
+			ApplicationUser currentUser = _db.Users.FirstOrDefault(x => x.Id == currentUserId);
+			ViewBag.UserName = currentUser.FirstName + " " + currentUser.LastName;
+
 			ViewBag.StatusMessage =
 				message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
 				: message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
