@@ -1,13 +1,13 @@
 ﻿@model RadioPlayout.Models.IndexViewModel
 @{
-    ViewBag.Title = "Manage";
+    ViewBag.Title = "My Account";
 	Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
 <div class="container-fluid">
 	<div class="row no-gutters">
 		<div class="col-12 col-lg-7">
-			@Html.Partial("~/Views/Manage/EditDetails.cshtml", new RadioPlayout.Models.EditDetailsViewModel())
+			@Html.Partial("~/Views/Manage/_EditDetails.cshtml", new RadioPlayout.Models.EditDetailsViewModel())
 		</div>
 		<div class="col-12 col-lg-5">
 			@Html.Partial("~/Views/Manage/_ChangePassword.cshtml", new RadioPlayout.Models.ChangePasswordViewModel())

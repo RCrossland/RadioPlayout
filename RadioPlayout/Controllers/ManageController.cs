@@ -76,6 +76,13 @@ namespace RadioPlayout.Controllers
 				Logins = await UserManager.GetLoginsAsync(userId),
 				BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
 			};
+
+			// Get user details
+			var user = await UserManager.FindByIdAsync(userId);
+			ViewBag.UserFirstName = user.FirstName;
+			ViewBag.UserLastName = user.LastName;
+			ViewBag.UserEmail = user.Email;
+
 			return View(model);
 		}
 
