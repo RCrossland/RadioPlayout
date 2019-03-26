@@ -11,6 +11,14 @@
 	<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 }
 
+@section scripts
+{
+	<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+	<script src="~/Scripts/Custom/manage_user.js"></script>
+}
+
+@Html.Partial("~/Views/Account/_AddUser.cshtml", new RadioPlayout.Models.AddUserViewModel())
+
 <div class="container-fluid">
 	<div class="row no-gutters">
 		<div class="col-12 col-lg-8">
@@ -19,7 +27,7 @@
 					<div class="row">
 						<div class="col-7 d-flex align-items-center">Manage User Accounts</div>
 						<div class="col-5 d-flex align-items-center justify-content-end">
-							<button type="button" class="btn btn-success" id="">Add User</button>
+							<button type="button" class="btn btn-success" id="add_user_modal_toggle">Add User</button>
 						</div>
 					</div>
 				</div>
@@ -57,10 +65,6 @@
 						<div class="col-4 ml-3">
 							Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
 							@Html.PagedListPager(Model, page => Url.Action("ManageAccounts", new { page, sortOrder = ViewBag.CurrentSort }))
-						</div>
-						<div class="col-7 d-flex justify-content-end">
-							<div class="text-success" id="autio_filter_success"></div>
-							<div class="text-danger" id="audio_filter_error"></div>
 						</div>
 					</div>
 				</div>

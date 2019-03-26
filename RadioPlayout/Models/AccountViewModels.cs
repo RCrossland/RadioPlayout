@@ -79,7 +79,7 @@ namespace RadioPlayout.Models
 		public string FilterEmail { get; set; }
 	}
 
-	public class RegisterViewModel
+	public class AddUserViewModel
 	{
 		[Required]
 		[EmailAddress]

@@ -214,8 +214,11 @@
     <Content Include="Scripts\Custom\audio_items.js" />
     <Content Include="Scripts\Custom\dashboard.js" />
     <Content Include="Scripts\Custom\global.js" />
+    <Content Include="Scripts\Custom\manage_user.js" />
     <Content Include="Scripts\Custom\radio_playout.js" />
     <Content Include="Scripts\Custom\schedule_clocks.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -236,6 +239,7 @@
     <Content Include="Views\Manage\_EditDetails.cshtml" />
     <Content Include="Views\Account\ManageAccounts.cshtml" />
     <Content Include="Views\Account\_FilterManageAccounts.cshtml" />
+    <Content Include="Views\Account\_AddUser.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
