@@ -1,12 +1,20 @@
 ﻿@model PagedList.IPagedList<RadioPlayout.Models.Audio>
 @using PagedList.Mvc;
-<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 
-<script src="https://unpkg.com/wavesurfer.js"></script>
-<script src="~/Scripts/Custom/audio_items.js"></script>
 @{
 	ViewBag.Title = "Music Catalogue";
 	Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+@section styles
+{
+	<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+}
+
+@section scripts
+{
+	<script src="https://unpkg.com/wavesurfer.js"></script>
+	<script src="~/Scripts/Custom/audio_items.js"></script>
 }
 
 @Html.Partial("EditAudioItemModal")

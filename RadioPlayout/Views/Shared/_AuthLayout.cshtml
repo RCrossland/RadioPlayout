@@ -3,6 +3,10 @@
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@section styles
+{
+	@RenderSection("styles", required: false)
+}
 @section scripts
 {
 	@RenderSection("scripts", required: false)
@@ -81,9 +85,14 @@
 							</a>
 						</li>
 						<li class="navbar-item left_navigation_list_item">
+							<a href="@Url.Action("ManageAccounts", "Account")" class="left_navigation_list_item_link">
+								Manage Accounts
+							</a>
+						</li>
+						<li class="navbar-item left_navigation_list_item">
 							@using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
 							{
-							@Html.AntiForgeryToken()
+								@Html.AntiForgeryToken()
 								<a href="javascript:document.getElementById('logoutForm').submit()" class="left_navigation_list_item_link">
 									Logout
 								</a>

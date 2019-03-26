@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using PagedList;
 using RadioPlayout.Models;
 
 namespace RadioPlayout.Controllers
@@ -15,6 +16,7 @@ namespace RadioPlayout.Controllers
 	[Authorize]
 	public class AccountController : Controller
 	{
+		private ApplicationDbContext _db = new ApplicationDbContext();
 		private ApplicationSignInManager _signInManager;
 		private ApplicationUserManager _userManager;
 
@@ -132,6 +134,85 @@ namespace RadioPlayout.Controllers
 					ModelState.AddModelError("", "Invalid code.");
 					return View(model);
 			}
+		}
+
+		//
+		// GET: /Account/ManageAccounts
+		public ActionResult ManageAccounts(string sortOrder, string FilterFirstName, string currentFilterFirstName, 
+			string FilterLastName, string currentFilterLastName, string FilterEmail, string currentFilterEmail, int? page)
+		{
+			GetUserName();
+
+			ViewBag.CurrentSort = sortOrder;
+			ViewBag.FirstNameSortParam = sortOrder == "first_name" ? "first_name_desc" : "first_name";
+			ViewBag.LastNameSortParam = sortOrder == "last_name" ? "last_name_desc" : "last_name";
+			ViewBag.EmailSortParam = sortOrder == "email" ? "email_desc" : "email";
+
+			// If the user submits a new search request set the page to 1
+			if (FilterFirstName != null || FilterLastName != null || FilterEmail != null)
+			{
+				page = 1;
+			}
+			else
+			{
+				FilterFirstName = currentFilterFirstName;
+				FilterLastName = currentFilterLastName;
+				FilterEmail = currentFilterEmail;
+			}
+
+			// Set the filter viewbag values
+			ViewBag.currentFilterFirstName = FilterFirstName;
+			ViewBag.currentFilterLastName = FilterLastName;
+			ViewBag.currentFilterEmail = FilterEmail;
+
+			IQueryable<ApplicationUser> users = _db.Users;
+
+			// If the search terms have values then use them to filter the result
+			if (!String.IsNullOrWhiteSpace(FilterFirstName))
+			{
+				users = users.Where(u => u.FirstName.Contains(FilterFirstName));
+			}
+
+			if (!String.IsNullOrWhiteSpace(FilterLastName))
+			{
+				users = users.Where(u => u.LastName.Contains(FilterLastName));
+			}
+
+			if (!String.IsNullOrWhiteSpace(FilterEmail))
+			{
+				users = users.Where(u => u.Email.Contains(FilterEmail));
+			}
+
+			switch(sortOrder)
+			{
+				case "first_name":
+					users = users.OrderBy(u => u.FirstName);
+					break;
+				case "first_name_desc":
+					users = users.OrderByDescending(u => u.FirstName);
+					break;
+				case "last_name":
+					users = users.OrderBy(u => u.LastName);
+					break;
+				case "last_name_desc":
+					users = users.OrderByDescending(u => u.LastName);
+					break;
+				case "email":
+					users = users.OrderBy(u => u.Email);
+					break;
+				case "email_desc":
+					users = users.OrderByDescending(u => u.Email);
+					break;
+				default:
+					users = users.OrderBy(u => u.FirstName);
+					break;
+			}
+
+			ViewBag.UserCount = users.Count();
+
+			int pageSize = 1;
+			int pageNumber = (page ?? 1);
+			return View(users.ToPagedList(pageNumber, pageSize));
 		}
 
 		//
@@ -484,6 +565,14 @@ namespace RadioPlayout.Controllers
 				}
 				context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
 			}
+		}
+
+		public void GetUserName()
+		{
+			// Get user details
+			string currentUserId = User.Identity.GetUserId();
+			ApplicationUser currentUser = _db.Users.FirstOrDefault(x => x.Id == currentUserId);
+			ViewBag.UserName = currentUser.FirstName + " " + currentUser.LastName;
 		}
 		#endregion
 	}

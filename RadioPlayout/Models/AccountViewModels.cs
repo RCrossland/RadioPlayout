@@ -63,6 +63,22 @@ namespace RadioPlayout.Models
 		public bool RememberMe { get; set; }
 	}
 
+	public class FilterUsersModel
+	{
+		[DataType(DataType.Text)]
+		[Display(Name = "First Name")]
+		public string FilterFirstName { get; set; }
+
+		[DataType(DataType.Text)]
+		[Display(Name = "Last Name")]
+		public string FilterLastName { get; set; }
+
+		[EmailAddress]
+		[DataType(DataType.Text)]
+		[Display(Name = "Email")]
+		public string FilterEmail { get; set; }
+	}
+
 	public class RegisterViewModel
 	{
 		[Required]

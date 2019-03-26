@@ -1,0 +1,73 @@
+﻿@model PagedList.IPagedList<RadioPlayout.Models.ApplicationUser>
+@using PagedList.Mvc;
+
+@{
+	ViewBag.Title = "ManageAccounts";
+	Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+@section styles
+{
+	<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+}
+
+<div class="container-fluid">
+	<div class="row no-gutters">
+		<div class="col-12 col-lg-8">
+			<div class="card">
+				<div class="card-header bg-dark text-white">
+					<div class="row">
+						<div class="col-7 d-flex align-items-center">Manage User Accounts</div>
+						<div class="col-5 d-flex align-items-center justify-content-end">
+							<button type="button" class="btn btn-success" id="">Add User</button>
+						</div>
+					</div>
+				</div>
+				<div class="card-body overflow-hidden p-0">
+					<div class="table-responsive">
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<th scope="col">
+										@Html.ActionLink("First Name", "ManageAccounts", new { sortOrder = ViewBag.FirstNameSortParam, currentFilter = ViewBag.CurrentFilter }, new { @class = "no_style" })
+									</th>
+									<th scope="col">
+										@Html.ActionLink("Last Name", "ManageAccounts", new { sortOrder = ViewBag.LastNameSortParam, currentFilter = ViewBag.CurrentFilter }, new { @class = "no_style" })
+									</th>
+									<th scope="col">
+										@Html.ActionLink("Email", "ManageAccounts", new { sortOrder = ViewBag.EmailSortParam, currentFilter = ViewBag.CurrentFilter }, new { @class = "no_style" })
+									</th>
+									<th scope="col">Level</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var item in Model)
+								{
+									<tr>
+										<td>@item.FirstName</td>
+										<td>@item.LastName</td>
+										<td>@item.Email</td>
+										<td>User Level</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+					<div class="row d-flex align-items-center">
+						<div class="col-4 ml-3">
+							Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+							@Html.PagedListPager(Model, page => Url.Action("ManageAccounts", new { page, sortOrder = ViewBag.CurrentSort }))
+						</div>
+						<div class="col-7 d-flex justify-content-end">
+							<div class="text-success" id="autio_filter_success"></div>
+							<div class="text-danger" id="audio_filter_error"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-12 col-lg-4">
+			@Html.Partial("~/Views/Account/_FilterManageAccounts.cshtml", new RadioPlayout.Models.FilterUsersModel())
+		</div>
+	</div>
+</div>

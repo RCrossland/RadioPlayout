@@ -1,0 +1,45 @@
+﻿@model RadioPlayout.Models.FilterUsersModel
+
+<div class="card">
+	@using (Html.BeginForm("ManageAccounts", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+	{
+		@Html.AntiForgeryToken()
+		<div class="card-header bg-dark text-white">
+			<div class="row">
+				<div class="col-8 d-flex align-items-center">Filter Users</div>
+				<div class="col-4 d-flex align-items-center justify-content-end">
+					<input type="submit" class="btn btn-secondary" value="Filter">
+				</div>
+			</div>
+		</div>
+		<div class="card-body overflow-hidden">
+			<div class="row">
+				<div class="col-6">
+					<div class="form-group">
+						@Html.LabelFor(m => m.FilterFirstName, new { @class = "control-label" })
+						@Html.TextBoxFor(m => m.FilterFirstName, new { @class = "form-control" })
+					</div>
+				</div>
+				<div class="col-6">
+					<div class="form-group">
+						@Html.LabelFor(m => m.FilterLastName, new { @class = "control-label" })
+						@Html.TextBoxFor(m => m.FilterLastName, new { @class = "form-control" })
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					<div class="form-group">
+						@Html.LabelFor(m => m.FilterEmail, new { @class = "control-label" })
+						@Html.TextBoxFor(m => m.FilterEmail, new { @class = "form-control" })
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 text-secondary">
+					@ViewBag.UserCount Results Returned
+				</div>
+			</div>
+		</div>
+	}
+</div>
