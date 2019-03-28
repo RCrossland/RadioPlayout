@@ -17,7 +17,8 @@
 	<script src="~/Scripts/Custom/manage_user.js"></script>
 }
 
-@Html.Partial("~/Views/Account/_AddUser.cshtml", new RadioPlayout.Models.AddUserViewModel())
+@Html.Partial("~/Views/Account/_AddUser.cshtml", new RadioPlayout.Models.UserViewModel())
+@Html.Partial("~/Views/Account/_EditUser.cshtml", new RadioPlayout.Models.EditUserViewModel())
 
 <div class="container-fluid">
 	<div class="row no-gutters">
@@ -46,17 +47,21 @@
 										@Html.ActionLink("Email", "ManageAccounts", new { sortOrder = ViewBag.EmailSortParam, currentFilter = ViewBag.CurrentFilter }, new { @class = "no_style" })
 									</th>
 									<th scope="col">Level</th>
+									<th></th>
+									<th></th>
 								</tr>
 							</thead>
-							<tbody>
+							<tbody id="user_list_outer" data-edit-url="@Url.Action("FindUserData", "Account")" data-delete-url="@Url.Action("DeleteUser", "Account")">
 								@foreach (var item in Model)
 								{
-									<tr>
-										<td>@item.FirstName</td>
-										<td>@item.LastName</td>
-										<td>@item.Email</td>
-										<td>User Level</td>
-									</tr>
+								<tr>
+									<td>@item.FirstName</td>
+									<td>@item.LastName</td>
+									<td>@item.Email</td>
+									<td>User Level</td>
+									<td><i class="fas fa-pencil-alt pointer edit_user_btn" data-audio-id="@item.Id" title="Edit"></i></td>
+									<td><i class="fas fa-times pointer delete_user_btn" data-audio-id="@item.Id"></i></td>
+								</tr>
 								}
 							</tbody>
 						</table>

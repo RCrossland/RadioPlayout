@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -220,7 +221,7 @@ namespace RadioPlayout.Controllers
 		// POST: /Account/AddUser
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> AddUser(AddUserViewModel model)
+		public async Task<ActionResult> AddUser(UserViewModel model)
 		{
 			if (ModelState.IsValid)
 			{
@@ -248,43 +249,87 @@ namespace RadioPlayout.Controllers
 				errors.AddRange(modelStateVal.Errors.Select(error => error.ErrorMessage));
 			}
 			return Json(new { status = "validationerror", errors = errors });
-
 		}
 
 		//
-		// POST: /Account/Register
-		//[HttpPost]
-		//[AllowAnonymous]
-		//[ValidateAntiForgeryToken]
-		//public async Task<ActionResult> Register(RegisterViewModel model)
-		//{
-		//	if (ModelState.IsValid)
-		//	{
-		//		var user = new ApplicationUser {
-		//			UserName = model.Email,
-		//			Email = model.Email,
-		//			FirstName = model.FirstName,
-		//			LastName = model.LastName
-		//		};
-		//		var result = await UserManager.CreateAsync(user, model.Password);
-		//		if (result.Succeeded)
-		//		{
-		//			await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+		// POST: /Account/DeleteUser
+		[HttpPost]
+		public ActionResult DeleteUser(string userId) {
+			var user = UserManager.FindById(userId);
 
-		//			// For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-		//			// Send an email with this link
-		//			// string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-		//			// var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-		//			// await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+			if(user != null)
+			{
+				var deleteResult = UserManager.DeleteAsync(user);
 
-		//			return RedirectToAction("Index", "Home");
-		//		}
-		//		AddErrors(result);
-		//	}
 
-		//	// If we got this far, something failed, redisplay form
-		//	return View(model);
-		//}
+				return Json(new { status = "success" });
+			}
+
+			// If execution gets to this stage, there has been an error
+			return Json(new { status = "deleteerror" });
+		}
+
+		//
+		// POST: /Account/FindUserDetails
+		[HttpPost]
+		public ActionResult FindUserData(string userId)
+		{
+			var user = UserManager.FindById(userId);
+
+			if(user != null)
+			{
+				return Json(new { status = "success", user = user });
+			}
+
+			Response.StatusCode = (int)HttpStatusCode.BadRequest;
+			return Json(new { status = "error", error = "Error finding user data" });
+		}
+
+		// POST: /Account/EditUser
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<ActionResult> EditUser(EditUserViewModel model)
+		{
+			if (ModelState.IsValid)
+			{
+				var user = UserManager.FindByEmail(model.OldEmail);
+
+				if(user != null)
+				{
+					user.FirstName = model.FirstName;
+					user.LastName = model.LastName;
+					user.Email = model.Email;
+
+					var detailsResult = await UserManager.UpdateAsync(user);
+
+					if (detailsResult.Succeeded)
+					{
+						if (!String.IsNullOrWhiteSpace(model.Password))
+						{
+							var token = UserManager.GeneratePasswordResetToken(user.Id);
+							var passwordResult = UserManager.ResetPassword(user.Id, token, model.Password);
+
+							if (passwordResult.Succeeded)
+							{
+								return Json(new { status = "success" });
+							}
+						}
+						else
+						{
+							return Json(new { status = "success", user = user });
+						}
+					}
+				}
+			}
+
+			// If it gets this far an error has occured
+			var errors = new List<string>();
+			foreach (var modelStateVal in ViewData.ModelState.Values)
+			{
+				errors.AddRange(modelStateVal.Errors.Select(error => error.ErrorMessage));
+			}
+			return Json(new { status = "validationerror", errors = errors });
+		}
 
 		//
 		// GET: /Account/ConfirmEmail
@@ -535,6 +580,50 @@ namespace RadioPlayout.Controllers
 			}
 
 			base.Dispose(disposing);
+		}
+
+		//
+		// GET: /Account/Register
+		[AllowAnonymous]
+		public ActionResult Register()
+		{
+			return View();
+		}
+
+		//
+		// POST: /Account/Register
+		[HttpPost]
+		[AllowAnonymous]
+		[ValidateAntiForgeryToken]
+		public async Task<ActionResult> Register(RegisterViewModel model)
+		{
+			if (ModelState.IsValid)
+			{
+				var user = new ApplicationUser
+				{
+					UserName = model.Email,
+					Email = model.Email,
+					FirstName = model.FirstName,
+					LastName = model.LastName
+				};
+				var result = await UserManager.CreateAsync(user, model.Password);
+				if (result.Succeeded)
+				{
+					await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+
+					// For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
+					// Send an email with this link
+					// string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+					// var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+					// await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+
+					return RedirectToAction("Index", "Home");
+				}
+				AddErrors(result);
+			}
+
+			// If we got this far, something failed, redisplay form
+			return View(model);
 		}
 
 		#region Helpers

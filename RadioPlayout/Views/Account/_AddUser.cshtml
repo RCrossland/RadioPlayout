@@ -1,7 +1,10 @@
-﻿@model RadioPlayout.Models.AddUserViewModel
+﻿@model RadioPlayout.Models.UserViewModel
 
 <script>
-	function OnSuccess(response) {
+	function AddUserOnSuccess(response) {
+		var $summaryUl = $(".validation-summary-valid").find("ul");
+		$summaryUl.empty();
+
 		if (response.status === 'validationerror') {
 			var $summaryUl = $(".validation-summary-valid").find("ul");
 			$summaryUl.empty();
@@ -12,6 +15,7 @@
 				});
 		}
 		else if (response.status === "success") {
+
 			$("#add_user_success").empty().append("Successfully added user.");
 		}
 	}
@@ -23,7 +27,7 @@
 			<div class="modal-header">
 				<h5 class="modal-title">Add User</h5>
 			</div>
-			@using (Ajax.BeginForm("AddUser", "Account", new AjaxOptions { OnSuccess = "OnSuccess" }))
+			@using (Ajax.BeginForm("AddUser", "Account", new AjaxOptions { OnSuccess = "AddUserOnSuccess" }, new { id="add_user_form" }))
 			{
 			<div class="modal-body">
 				@Html.AntiForgeryToken()
@@ -54,13 +58,13 @@
 					<div class="col-6">
 						<div class="form-group">
 							@Html.LabelFor(m => m.Password, new { @class = "control-label" })
-							@Html.TextBoxFor(m => m.Password, new { @class = "form-control" })
+							@Html.EditorFor(m => m.Password, new { htmlAttributes = new { @class = "form-control" } })
 						</div>
 					</div>
 					<div class="col-6">
 						<div class="form-group">
 							@Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
-							@Html.TextBoxFor(m => m.ConfirmPassword, new { @class = "form-control" })
+							@Html.EditorFor(m => m.ConfirmPassword, new { htmlAttributes = new { @class = "form-control" } })
 						</div>
 					</div>
 				</div>

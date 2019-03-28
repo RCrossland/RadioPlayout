@@ -21,7 +21,22 @@ namespace RadioPlayout.Migrations
 			context.AudioType.AddOrUpdate(r => r.AudioTypeName,
 				new Models.AudioType
 				{
-					AudioTypeName = "song",
+					AudioTypeName = "80s Song",
+					AudioAverageDuration = "180"
+				},
+				new Models.AudioType
+				{
+					AudioTypeName = "90s Song",
+					AudioAverageDuration = "180"
+				},
+				new Models.AudioType
+				{
+					AudioTypeName = "00s Song",
+					AudioAverageDuration = "180"
+				},
+				new Models.AudioType
+				{
+					AudioTypeName = "10s Song",
 					AudioAverageDuration = "180"
 				},
 				new Models.AudioType

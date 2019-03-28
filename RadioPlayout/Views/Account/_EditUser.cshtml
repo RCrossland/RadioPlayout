@@ -1,0 +1,83 @@
+﻿@model RadioPlayout.Models.EditUserViewModel
+
+<script>
+	function EditUserOnSuccess(response) {
+		if (response.status === 'validationerror') {
+			var $summaryUl = $(".validation-summary-valid").find("ul");
+			$summaryUl.empty();
+
+			$.each(response.errors,
+				function (a, b) {
+					$summaryUl.append($("<li>").text(b));
+				});
+		}
+		else if (response.status === "success") {
+			$("#edit_user_success").empty().append("Successfully edited user.");
+		}
+	}
+</script>
+
+<div class="modal fade" id="edit_user_modal" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Edit User</h5>
+			</div>
+			@using (Ajax.BeginForm("EditUser", "Account", new AjaxOptions { OnSuccess = "EditUserOnSuccess" }, new { id="edit_user_form" }))
+			{
+				<div class="modal-body">
+					@Html.AntiForgeryToken()
+
+					<div class="row">
+						<div class="col-6">
+							<div class="form-group">
+								@Html.LabelFor(m => m.FirstName, new { @class = "control-label" })
+								@Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", id="edit_user_first_name" })
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="form-group">
+								@Html.LabelFor(m => m.LastName, new { @class = "control-label" })
+								@Html.TextBoxFor(m => m.LastName, new { @class = "form-control", id="edit_user_last_name" })
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<div class="form-group">
+								@Html.LabelFor(m => m.Email, new { @class = "control-label" })
+								@Html.TextBoxFor(m => m.Email, new { @class = "form-control", id="edit_user_email" })
+								@Html.HiddenFor(m => m.OldEmail, new { id = "edit_user_hidden_email" })
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="form-group">
+								@Html.LabelFor(m => m.Password, new { @class = "control-label" })
+								@Html.EditorFor(m => m.Password, new { htmlAttributes = new { @class = "form-control" } })
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="form-group">
+								@Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
+								@Html.EditorFor(m => m.ConfirmPassword, new { htmlAttributes = new { @class = "form-control" } })
+							</div>
+						</div>
+					</div>
+
+					@Html.ValidationSummary("", new { @class = "text-danger" })
+				</div>
+				<div class="modal-footer">
+					<div class="col-6">
+						<div id="edit_user_success" class="text-success"></div>
+						<div id="edit_user_error" class="text-danger"></div>
+					</div>
+					<div class="col-6 d-flex justify-content-end">
+						<input type="submit" class="btn btn-dark" value="Edit User" />
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+</div>

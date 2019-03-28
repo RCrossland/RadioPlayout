@@ -18,7 +18,11 @@ namespace RadioPlayout.Controllers
 			// Get user details
 			string currentUserId = User.Identity.GetUserId();
 			ApplicationUser currentUser = _db.Users.FirstOrDefault(x => x.Id == currentUserId);
-			ViewBag.UserName = currentUser.FirstName + " " + currentUser.LastName;
+
+			if(currentUser != null)
+			{
+				ViewBag.UserName = currentUser.FirstName + " " + currentUser.LastName;
+			}
 
 			return View();
 		}
