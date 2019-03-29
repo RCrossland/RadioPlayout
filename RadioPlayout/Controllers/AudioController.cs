@@ -39,7 +39,7 @@ namespace RadioPlayout.Controllers
 		/// <param name="page">The current page of the pagination.</param>
 		/// <returns></returns>
 		public ViewResult Index(string sortOrder, string searchString, string currentSearchString, string audioType, string currentAudioType, string audioMinDuration, 
-			string currentAudioMinDuration, string audioMaxDuration, string currentAudioMaxDuration, string audioYear, string currentAudioYear, int? page)
+			string currentAudioMinDuration, string audioMaxDuration, string currentAudioMaxDuration, string audioReleaseYear, string currentAudioYear, int? page)
 		{
 			// Get user details
 			string currentUserId = User.Identity.GetUserId();
@@ -52,7 +52,7 @@ namespace RadioPlayout.Controllers
 			ViewBag.AudioDurationSortParam = sortOrder == "audio_duration" ? "audio_duration_desc" : "audio_duration";
 
 			// If the user has set a new filter go back to page 1
-			if(searchString != null || audioType != null || audioMinDuration != null || audioMaxDuration != null || audioYear != null)
+			if(searchString != null || audioType != null || audioMinDuration != null || audioMaxDuration != null || audioReleaseYear != null)
 			{
 				page = 1;
 			}
@@ -62,7 +62,7 @@ namespace RadioPlayout.Controllers
 				audioType = currentAudioType;
 				audioMinDuration = currentAudioMinDuration;
 				audioMaxDuration = currentAudioMaxDuration;
-				audioYear = currentAudioYear;
+				audioReleaseYear = currentAudioYear;
 			}
 
 			// Reset the ViewBag values
@@ -70,7 +70,7 @@ namespace RadioPlayout.Controllers
 			ViewBag.currentAudioType = audioType;
 			ViewBag.currentAudioMinDuration = audioMinDuration;
 			ViewBag.currentAudioMaxDuration = audioMaxDuration;
-			ViewBag.currentAudioYear = audioYear;
+			ViewBag.currentAudioYear = audioReleaseYear;
 
 			IQueryable<Audio> audio = _db.Audio;
 
@@ -102,9 +102,9 @@ namespace RadioPlayout.Controllers
 			}
 
 			// Sort the audio items based on the release year
-			if (!String.IsNullOrWhiteSpace(audioYear))
+			if (!String.IsNullOrWhiteSpace(audioReleaseYear))
 			{
-				int audioYearInt = Int32.Parse(audioYear);
+				int audioYearInt = Int32.Parse(audioReleaseYear);
 				audio = audio.Where(r => r.AudioReleaseYear.Equals(audioYearInt));
 			}
 
@@ -322,7 +322,7 @@ namespace RadioPlayout.Controllers
 				{
 					ArtistName = artistName,
 					AudioTitle = audioTitle,
-					AudioLocation = "Content/Audio/" + audioLocation,
+					AudioLocation = audioLocation,
 					AudioDuration = Int32.Parse(audioDuration),
 					AudioIn = Int32.Parse(audioIn),
 					AudioOut = Int32.Parse(audioOut),
@@ -410,7 +410,7 @@ namespace RadioPlayout.Controllers
 				{
 					audioItem.ArtistName = artistName;
 					audioItem.AudioTitle = audioTitle;
-					audioItem.AudioLocation = "/Content/Audio/" + audioLocation;
+					audioItem.AudioLocation = audioLocation;
 					audioItem.AudioDuration = Int32.Parse(audioDuration);
 					audioItem.AudioIn = Int32.Parse(audioIn);
 					audioItem.AudioOut = Int32.Parse(audioOut);
@@ -427,9 +427,10 @@ namespace RadioPlayout.Controllers
 		/// <summary>
 		/// Called from a XHR request from a form input file. This will upload the files to /Content/Audio/Upload
 		/// </summary>
+		/// 
 		/// <returns></returns>
 		[HttpPost]
-		public ActionResult UploadAudioFile()
+		public JsonResult UploadAudioFile()
 		{
 			if (Request.Files.Count > 0)
 			{
@@ -477,21 +478,10 @@ namespace RadioPlayout.Controllers
 		[HttpPost]
 		public ActionResult DeleteAudioItem(string audioId)
 		{
-			errorDict.Clear();
 			// AudioId placeholder when converting to an int
 			int audioIdInt = 0;
 			// Validate audio Id
-			if (String.IsNullOrWhiteSpace(audioId))
-			{
-				errorDict.Add("AudioItem", "There was an error deleting this audio item.");
-			}
-			else if(!Int32.TryParse(audioId, out audioIdInt))
-			{
-				errorDict.Add("AudioItem", "There was an error deleting this audio item");
-			}
-			
-			// Check whether any errors occured
-			if(errorDict.Count > 0)
+			if (String.IsNullOrWhiteSpace(audioId) || !Int32.TryParse(audioId, out audioIdInt))
 			{
 				Response.StatusCode = (int)HttpStatusCode.BadRequest;
 				return Json(errorDict);
@@ -503,6 +493,9 @@ namespace RadioPlayout.Controllers
 				foreach (var audioItem in audioItems)
 				{
 					_db.Audio.Remove(audioItem);
+
+					// Remove audio file
+					System.IO.File.Delete(Request.MapPath("~/Content/Audio/" + audioItem.AudioLocation));
 				}
 				_db.SaveChanges();
 

@@ -202,8 +202,6 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Audio\Adele - Hello.wav" />
-    <Content Include="Content\Audio\Olly Murs - Excuses.wav" />
     <Content Include="Content\CSS\Custom\main.css" />
     <Content Include="Content\CSS\Custom\responsive.css" />
     <Content Include="Content\Images\Login\Radio-Background.jpg" />
@@ -272,7 +270,7 @@
     <Content Include="Views\Audio\Index.cshtml" />
     <Content Include="Views\RadioPlayer\MusicCatalogueModal.cshtml" />
     <Content Include="Views\RadioPlayer\EnterRadioPlayerModal.cshtml" />
-    <Content Include="Views\Audio\EditAudioItemModal.cshtml" />
+    <Content Include="Views\Audio\_EditAudioItemModal.cshtml" />
     <Content Include="Views\Schedule\Index.cshtml" />
     <None Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
   </ItemGroup>

@@ -21,61 +21,45 @@ namespace RadioPlayout.Migrations
 			context.AudioType.AddOrUpdate(r => r.AudioTypeName,
 				new Models.AudioType
 				{
+					AudioTypeId = 1,
 					AudioTypeName = "80s Song",
 					AudioAverageDuration = "180"
 				},
 				new Models.AudioType
 				{
+					AudioTypeId = 2,
 					AudioTypeName = "90s Song",
 					AudioAverageDuration = "180"
 				},
 				new Models.AudioType
 				{
+					AudioTypeId = 3,
 					AudioTypeName = "00s Song",
 					AudioAverageDuration = "180"
 				},
 				new Models.AudioType
 				{
+					AudioTypeId = 4,
 					AudioTypeName = "10s Song",
 					AudioAverageDuration = "180"
 				},
 				new Models.AudioType
 				{
-					AudioTypeName = "jingle",
+					AudioTypeId = 5,
+					AudioTypeName = "Jingle",
 					AudioAverageDuration = "5"
 				},
 				new Models.AudioType
 				{
-					AudioTypeName = "bed",
+					AudioTypeId = 6,
+					AudioTypeName = "Bed",
 					AudioAverageDuration = "180"
 				},
 				new Models.AudioType
 				{
-					AudioTypeName = "fx",
+					AudioTypeId = 7,
+					AudioTypeName = "FX",
 					AudioAverageDuration = "3"
-				}
-			);
-
-			context.Audio.AddOrUpdate(r => r.ArtistName,
-				new Models.Audio
-				{
-					ArtistName = "Olly Murs",
-					AudioTitle = "Excuses",
-					AudioLocation = "/Content/Audio/Olly Murs - Excuses.wav",
-					AudioDuration = 246,
-					AudioIn = 10,
-					AudioOut = 5,
-					AudioReleaseYear = 2018
-				},
-				new Models.Audio
-				{
-					ArtistName = "Adele",
-					AudioTitle = "Hello",
-					AudioLocation = "/Content/Audio/Adele - Hello.wav",
-					AudioDuration = 30,
-					AudioIn = 5,
-					AudioOut = 10,
-					AudioReleaseYear = 2017
 				}
 			);
 		}

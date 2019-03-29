@@ -57,7 +57,7 @@ let editAudioItems = {
         s.audioReleaseYearRef = $("#audio_release_year");
         s.audioInRef = $("#audio_in");
         s.audioOutRef = $("#audio_out");
-        s.audioDurationRef = $("#audio_duration");
+        s.audioDurationRef = $(".audio_duration");
         s.audioFileRef = $("#audio_file_upload");
 
         s.audioModalError = $("#audio_modal_error");
@@ -75,6 +75,13 @@ let editAudioItems = {
 
             // reset the Audio Item form
             s.audioItemForm.trigger("reset");
+
+            // reset form messages
+            $("#audio_modal_success").empty();
+            $("#audio_modal_error").empty();
+
+            // reset the track duration
+            $(".audio_duration").attr("value", "00:00:00");
 
             // Reset the form error messages
             $(".audio_error").val("test");
@@ -153,7 +160,12 @@ let editAudioItems = {
                     // Match one or more ["] double quotes and apply to the entire string an empty ''
                     editAudioItems.loadWaveForm(xhr.responseText.replace(/["]+/g, ''));
                 }
+                else if (xhr.status == 404) {
+                    // If we get a 404 error here. It is usually because the file being uploaded it to big
+                    $("#audio_modal_error").empty().append("The file uploaded is to big. Please try again.");
+                }
             }
+
         });
     },
     loadWaveForm: function (filePath) {
@@ -165,7 +177,7 @@ let editAudioItems = {
             // Get the duration and display it to the user
             let date = new Date(null);
             date.setSeconds(editAudioItems.settings.wavesurfer.getDuration());
-            $("#audio_duration").attr("value", date.toISOString().substr(11, 8));
+            $(".audio_duration").attr("value", date.toISOString().substr(11, 8));
 
             let audioInCheck = false;
             // Set a click event handler on both of the AudioIn and AudioOut input boxes
@@ -248,14 +260,11 @@ let editAudioItems = {
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 let response = jqXHR.responseJSON;
-
-                console.log("Sending to Display Validation");
                 editAudioItems.displayValidation(response);
             }
         });
     },
     editAudioItemSubmit: function () {
-        console.log(s.audioFileRef.data("file-name"));
         $.ajax({
             url: $("#audio_item_form").data("update-url"),
             type: "POST",
@@ -274,7 +283,8 @@ let editAudioItems = {
                 $("#audio_modal_success").text("The audio item was successfully updated.");
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                //or you can put jqXHR.responseText somewhere as complete response. Its html.
+                let response = jqXHR.responseJSON;
+                editAudioItems.displayValidation(response);
             }
         });
     },
@@ -395,6 +405,7 @@ let editAudioItems = {
     displayValidation: function (ajaxResponse) {
         if (ajaxResponse.hasOwnProperty("ArtistName")) {
             s.artistNameErrorRef.text(ajaxResponse.ArtistName);
+            return false;
         }
         else {
             s.artistNameErrorRef.text("");
@@ -402,6 +413,7 @@ let editAudioItems = {
 
         if (ajaxResponse.hasOwnProperty("AudioTitle")) {
             s.audioTitleErrorRef.text(ajaxResponse.AudioTitle);
+            return false;
         }
         else {
             s.audioTitleErrorRef.text("");
@@ -409,6 +421,7 @@ let editAudioItems = {
 
         if (ajaxResponse.hasOwnProperty("AudioLocation")) {
             s.audioModalError.text(ajaxResponse.AudioLocation);
+            return false;
         }
         else {
             s.audioModalError.text("");
@@ -416,6 +429,7 @@ let editAudioItems = {
 
         if (ajaxResponse.hasOwnProperty("AudioDuration")) {
             s.audioDurationErrorRef.text(ajaxResponse.AudioDuration);
+            return false;
         }
         else {
             s.audioDurationErrorRef.text("");
@@ -423,6 +437,7 @@ let editAudioItems = {
 
         if (ajaxResponse.hasOwnProperty("AudioIn")) {
             s.audioInErrorRef.text(ajaxResponse.AudioIn);
+            return false;
         }
         else {
             s.audioInErrorRef.text("");
@@ -430,6 +445,7 @@ let editAudioItems = {
 
         if (ajaxResponse.hasOwnProperty("AudioOut")) {
             s.audioOutErrorRef.text(ajaxResponse.AudioOut);
+            return false;
         }
         else {
             s.audioOutErrorRef.text("");
@@ -437,6 +453,7 @@ let editAudioItems = {
 
         if (ajaxResponse.hasOwnProperty("AudioReleaseYear")) {
             s.audioReleaseYearErrorRef.text(ajaxResponse.AudioReleaseYear);
+            return false;
         }
         else {
             s.audioReleaseYearErrorRef.text("");
@@ -444,6 +461,7 @@ let editAudioItems = {
 
         if (ajaxResponse.hasOwnProperty("AudioType")) {
             s.audioTypeErrorRef.text(ajaxResponse.AudioType);
+            return false;
         }
         else {
             s.audioTypeErrorRef.text("");
@@ -451,6 +469,7 @@ let editAudioItems = {
 
         if (ajaxResponse.hasOwnProperty("Audio")) {
             s.audioModalError.text(ajaxResponse.Audio);
+            return false;
         }
         else {
             s.audioModalError.text("");
@@ -497,7 +516,7 @@ let editAudioItems = {
                 s.audioReleaseYearRef.val(audioItem.AudioReleaseYear);
 
                 $("#audio_item_form").attr("data-audio-id", audioItem.AudioId);
-                $("#audio_file_upload").attr("data-file-name", audioItem.AudioLocation.split('\\').pop()); // Split the file path just to get the filename
+                $("#audio_file_upload").attr("data-file-name", audioItem.AudioLocation); // Split the file path just to get the filename
 
                 let date = new Date(null);
                 date.setSeconds(audioItem.AudioIn);
@@ -506,7 +525,7 @@ let editAudioItems = {
                 date.setSeconds(audioItem.AudioOut);
                 s.audioOutRef.val(date.toISOString().substr(11, 8));
 
-                editAudioItems.loadWaveForm(audioItem.AudioLocation.replace(/["]+/g, ''));
+                editAudioItems.loadWaveForm("Content/Audio/" + audioItem.AudioLocation);
             },
             error: function (jqXHR, textStatus, errorThrown) {
             }
