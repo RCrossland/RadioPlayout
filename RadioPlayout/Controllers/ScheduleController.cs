@@ -166,5 +166,50 @@ namespace RadioPlayout.Controllers
 
 			return Json(scheduleClock);
 		}
-    }
+
+		[HttpPost]
+		public ActionResult GenerateScheduleClock(string scheduleClockId)
+		{
+			// Placeholder for the scheduleAudioItems list that will eventually be returned
+			List<Audio> scheduleAudioItems = new List<Audio>();
+
+			// Place holder for the scheduleClockId as an integer
+			int scheduleClockIdInt;
+			if(!Int32.TryParse(scheduleClockId, out scheduleClockIdInt))
+			{
+				// The ScheduleClockId couldn't be converted to an integer
+				Response.StatusCode = (int)HttpStatusCode.BadRequest;
+				return Json("The scheduleClockId couldn't be converted to an integer.");
+			}
+
+			// Get the scheduleClockItems from the database
+			var scheduleClockItems = _db.ScheduleClockItems.Where(c => c.ScheduleClock.ScheduleClockId.Equals(1)).ToList();
+
+			// If any scheduleClockItems were returned
+			if (scheduleClockItems.Any())
+			{
+				foreach (ScheduleClockItem scheduleClockItem in scheduleClockItems)
+				{	
+					// Get AudioItems from the database based on the scheduleClockItem audio type
+					var audioItem = _db.Audio.Where(m => m.AudioType.AudioTypeId.Equals(scheduleClockItem.AudioType.AudioTypeId)).ToList();
+
+					// If an audio item was returned, add a random audioItem to the list
+					if (audioItem.Count() > 0)
+					{
+						var rand = new Random();
+						scheduleAudioItems.Add(audioItem[rand.Next(audioItem.Count())]);
+					}
+				}
+			}
+
+			if(scheduleAudioItems.Count() <= 0)
+			{
+				// No scheduleAudioItems were returned
+				Response.StatusCode = (int)HttpStatusCode.BadRequest;
+				return Json("No schedule clock items were returned.");
+			}
+			
+			return Json(scheduleAudioItems);
+		}
+	}
 }

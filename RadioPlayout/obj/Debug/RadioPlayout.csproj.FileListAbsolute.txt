@@ -127,4 +127,5 @@ C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\bin\Microsoft.Owin.Security.
 C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\bin\System.Net.Http.Formatting.xml
 C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.Migrations.Initial.resources
 C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.csproj.GenerateResource.cache
+C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.Migrations.Removeshedulechanges.resources
 C:\Users\Rob\source\repos\RadioPlayout\RadioPlayout\obj\Debug\RadioPlayout.csprojAssemblyReference.cache

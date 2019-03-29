@@ -1,5 +1,5 @@
-﻿@using RadioPlayout.Models;
-@model dynamic
+﻿@model IEnumerable<RadioPlayout.Models.ScheduleClock>
+
 @{
 	ViewBag.Title = "Radio Playout";
 	Layout = "~/Views/Shared/_AuthLayout.cshtml";
@@ -198,17 +198,31 @@
 		</div>
 		<!-- Schedule -->
 		<div class="col-12 col-lg-4 p-0 schedule_content_outer">
-			<div class="card">
+			<div class="card h-100">
 				<div class="card-header bg-dark text-light text-center">Schedule</div>
 				<div class="card-body p-0">
 					<div class="row no-gutters schedule_content_header bg-secondary text-light text-center align-items-center">
 						<div class="col-5">Hour Duration - <span id="schedule_hour_duration">00:00:00</span></div>
 						<div class="col-5" id="schedule_hour_running">Overrun - 00:00:00</div>
-						<div class="col-1"><i class="fas fa-calendar-alt"></i></div>
-						<div class="col-1"><i class="fas fa-home pointer"></i></div>
+						<div class="col-1">
+							<div class="dropdown">
+								<button class="btn btn-secondary dropdown-toggle" type="button" id="schedule_clock_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<i class="far fa-clock"></i>
+								</button>
+								<div class="dropdown-menu" aria-labelledby="schedule_clock_dropdown">
+									<select name="audioType" class="form-control" id="schedule_clock_options" data-get-clock="@Url.Action("GenerateScheduleClock", "Schedule")">
+										<option selected disabled>Schedule Clocks</option>
+										@foreach (var schedule_clock in Model)
+										{
+											<option value="@schedule_clock.ScheduleClockId">@schedule_clock.ScheduleClockName</option>
+										}
+									</select>
+								</div>
+							</div>
+						</div>
 					</div>
-					<div class="row no-gutters radio_player_audio_info">
-						<div class="col-12 pre-scrollable" id="schedule_content_items_outer" data-request-url="@Url.Action("GetScheduleItemsData")" data-update-url="@Url.Action("UpdateScheduleItemOrderIndex")" data-new-url="@Url.Action("AddNewScheduleItem")" data-update-indicator-url="@Url.Action("UpdatePlayNextItemIndicator")">
+					<div class="row no-gutters radio_player_audio_info h-100">
+						<div class="col-12 pre-scrollable" id="schedule_content_items_outer">
 						</div>
 					</div>
 				</div>

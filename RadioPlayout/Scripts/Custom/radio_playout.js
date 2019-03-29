@@ -271,7 +271,7 @@ const radioPlayout = {
         };
     },
     loadPlayer1Track: function (trackData) {
-        s.radioPlayout1AudioRef.setAttribute('src', trackData.AudioLocation);
+        s.radioPlayout1AudioRef.setAttribute('src', "Content/Audio/" + trackData.AudioLocation);
 
         s.radioPlayout1AudioRef.onloadeddata = function () {
             s.radioPlayer1Locked = true;
@@ -307,7 +307,7 @@ const radioPlayout = {
         };
     },
     loadPlayer2Track: function (trackData) {
-        s.radioPlayout2AudioRef.setAttribute('src', trackData.AudioLocation);
+        s.radioPlayout2AudioRef.setAttribute('src', "Content/Audio/" + trackData.AudioLocation);
 
         s.radioPlayout2AudioRef.onloadeddata = function () {
             s.radioPlayer2Locked = true;
@@ -583,8 +583,7 @@ const musicLibrary = {
 
 const schedule = {
     settings: {
-        schedule: "1",
-        scheduleDate: "27 February 2019 01:00"
+        scheduleDate: new Date()
     },
     init: function () {
         s = schedule.settings;
@@ -638,17 +637,29 @@ const schedule = {
                             schedule.progressIndicatorChange($(this));
                         });
 
-                        schedule.calculateScheduleTimes();
+                        if ($("#schedule_content_items_outer").find(".current_track").length == 0) {
+                            $(ui.item[0]).addClass("current_track");
+                            radioPlayout.loadCurrentTrack();
+                        }
+                        else if ($("#schedule_content_items_outer").find(".next_track").length == 0) {
+                            $(ui.item[0]).addClass("next_track");
+                        }
 
-                        schedule.addNewScheduleItem(schedule.settings.schedule, ui.item.data("audio_id"), ui.item.index() + 1);
+                        schedule.calculateScheduleTimes();
                     });
                 }
                 else {
                     schedule.calculateScheduleTimes();
-
-                    schedule.updateScheduleItemPosition(ui.item.data("schedule_id"), ui.item.index() + 1);
                 }
             }
+        });
+
+        $('.dropdown-menu').click(function (e) {
+            e.stopPropagation();
+        });
+
+        $("#schedule_clock_options").on("change", function () {
+            schedule.changeScheduleClock($(this).val());
         });
     },
     progressIndicatorChange: function (selectedElement) {
@@ -659,102 +670,6 @@ const schedule = {
         else {
             $(selectedElement).children().removeClass("fa-pause").addClass("fa-play");
         }
-
-        // Update the database to reflect the change
-        $.ajax({
-            url: $("#schedule_content_items_outer").data("update-indicator-url"),
-            type: "POST",
-            data: { "scheduleItemId": $(selectedElement).data("schedule_item_id") },
-            success: function (data) {
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                // TODO: Add error messages when the schedule can't be loaded
-                //or you can put jqXHR.responseText somewhere as complete response. Its html.
-            }
-        })
-    },
-    getScheduleItems: function (scheduleId) {
-        $.ajax({
-            url: $("#schedule_content_items_outer").data("request-url"),
-            type: "POST",
-            data: { "scheduleId": scheduleId },
-            success: function (scheduleItems) {
-                $("#schedule_content_items_outer").empty();
-
-                $.each(scheduleItems, function (index, value) {
-                    let scheduleItemsHTML = "";
-                    if (index == 0) {
-                        scheduleItemsHTML = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect current_track\" data-audio_id=" + value.Audio.AudioId + " data-schedule_id=" + value.ScheduleItemsId + ">";
-                    }
-                    else if (index == 1) {
-                        scheduleItemsHTML = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect next_track\" data-audio_id=" + value.Audio.AudioId + " data-schedule_id=" + value.ScheduleItemsId + ">"
-                    }
-                    else {
-                        scheduleItemsHTML = "<div class=\"row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect\" data-audio_id=" + value.Audio.AudioId + " data-schedule_id=" + value.ScheduleItemsId + ">";
-                    }
-
-                    scheduleItemsHTML = scheduleItemsHTML + '<div class="col-2 schedule_item_time">00:00:00</div>' +
-                        '<div class="col-7">' +
-                            '<ul class="list-unstyled m-0 text-truncate">' +
-                                '<li>' + value.Audio.ArtistName + '</li>' +
-                                '<li>' + value.Audio.AudioTitle + '</li>' +
-                            '</ul>' +
-                        '</div>' +
-                        '<div class="col-2">' +
-                            '<ul class="list-unstyled m-0">' +
-                                '<li class="schedule_item_duration">' + value.Audio.AudioDuration + '</li>' +
-                                '<li>IN ' + value.Audio.AudioIn + '</li>' +
-                            '</ul>' +
-                        '</div>';
-                    if (value.PlayNextItem == 0) {
-                        scheduleItemsHTML = scheduleItemsHTML + '<div class="col-1 schedule_content_progress_indicator" data-schedule_item_id=' + value.ScheduleItemsId + '><i class="fas fa-pause pointer"></i></div >';
-                        } else {
-                        scheduleItemsHTML = scheduleItemsHTML + '<div class="col-1 schedule_content_progress_indicator" data-schedule_item_id=' + value.ScheduleItemsId + '><i class="fas fa-play pointer"></i></div >';
-                        }
-                        scheduleItemsHTML = scheduleItemsHTML + '</div>';
-                    $("#schedule_content_items_outer").append(scheduleItemsHTML);
-                });
-
-                schedule.bindUIAction();
-                schedule.calculateScheduleTimes();
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                // TODO: Add error messages when the schedule can't be loaded
-                //or you can put jqXHR.responseText somewhere as complete response. Its html.
-            }
-        });
-    },
-    updateScheduleItemPosition: function (scheduleItemId, newItemOrderIndex) {
-        $.ajax({
-            url: $("#schedule_content_items_outer").data("update-url"),
-            type: "POST",
-            data: {
-                "scheduleId": schedule.settings.schedule,
-                "scheduleItemId": scheduleItemId,
-                "newItemOrderIndex": newItemOrderIndex
-            },
-            success: function (data) {
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                //or you can put jqXHR.responseText somewhere as complete response. Its html.
-            }
-        });
-    },
-    addNewScheduleItem: function (scheduleId, audioId, orderIndex) {
-        $.ajax({
-            url: $("#schedule_content_items_outer").data("new-url"),
-            method: "POST",
-            data: {
-                "scheduleId": scheduleId,
-                "audioId": audioId,
-                "orderIndex": orderIndex
-            },
-            success: function (data) {
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                //or you can put jqXHR.responseText somewhere as complete response. Its html.
-            }
-        })
     },
     calculateScheduleTimes: function () {
         let currentTime = 0;
@@ -792,6 +707,67 @@ const schedule = {
 
             $("#schedule_hour_running")[0].innerHTML = "Overrun: " + date.toISOString().substr(11, 8);
         }
+    },
+    changeScheduleClock: function (scheduleClockId) {
+        $.ajax({
+            type: "POST",
+            url: $("#schedule_clock_options").data("get-clock"),
+            data: {
+                scheduleClockId: scheduleClockId
+            },
+            success: function (scheduleClock) {
+                schedule.loadScheduleClockItems(scheduleClock);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log("Error generating schedule clock");
+            }
+        })
+    },
+    loadScheduleClockItems: function (scheduleClock) {
+        $(".schedule_content_items_outer").empty();
+
+        $.each(scheduleClock, function (key, value) {
+            let scheduleItemHTML = "";
+
+            if (key == 0) {
+                scheduleItemHTML = scheduleItemHTML + "<div class='row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect current_track' data-audio_id='" + value.AudioId + "'>";
+            }
+            else if (key == 1) {
+                scheduleItemHTML = scheduleItemHTML + "<div class='row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect next_track' data-audio_id='" + value.AudioId + "'>";
+            }
+            else {
+                scheduleItemHTML = scheduleItemHTML + "<div class='row no-gutters schedule_content_item border border-top-0 border-dark align-items-center text-center pointer noSelect' data-audio_id='" + value.AudioId + "'>";
+            }
+
+            scheduleItemHTML = scheduleItemHTML + '<div class="col-2 schedule_item_time">00:00:00</div>' +
+                '<div class="col-7">' +
+                '<ul class="list-unstyled m-0 text-truncate">' +
+                '<li>' + value.ArtistName + '</li>' +
+                '<li>' + value.AudioTitle + '</li>' +
+                '</ul>' +
+                '</div>' +
+                '<div class="col-2">' +
+                '<ul class="list-unstyled m-0">' +
+                '<li class="schedule_item_duration">' + value.AudioDuration + '</li>' +
+                '<li>IN ' + value.AudioIn + '</li>' +
+                '</ul>' +
+                '</div>' +
+                '<div class="col-1 schedule_content_progress_indicator"><i class="fas fa-play pointer"></i></div>';
+
+            $("#schedule_content_items_outer").append(scheduleItemHTML);
+        });
+
+        // Set the event handlers for the progression indicators
+        $(".schedule_content_progress_indicator").off("click");
+        $(".schedule_content_progress_indicator").click(function (e) {
+            schedule.progressIndicatorChange($(this));
+        });
+
+        // Load the current track into the player
+        radioPlayout.loadCurrentTrack();
+
+        // Calculate schedule times
+        schedule.calculateScheduleTimes();
     }
 };
 
@@ -829,6 +805,4 @@ $(document).ready(function () {
     schedule.init();
     musicLibrary.init();
     autoDJSwitch.init();
-
-    schedule.getScheduleItems(1);
 });
