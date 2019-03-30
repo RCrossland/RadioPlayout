@@ -248,7 +248,7 @@ let editAudioItems = {
             data: {
                 "artistName": s.artistNameRef.val(),
                 "audioTitle": s.audioTitleRef.val(),
-                "audioLocation": s.audioFileRef.val().split('\\').pop(), // Split the file path just to get the filename
+                "audioFile": s.audioFileRef.val().split('\\').pop(), // Split the file path just to get the filename
                 "audioDuration": editAudioItems.getSeconds(s.audioDurationRef.val()),
                 "audioIn": editAudioItems.getSeconds(s.audioInRef.val()),
                 "audioOut": editAudioItems.getSeconds(s.audioOutRef.val()),
@@ -272,7 +272,7 @@ let editAudioItems = {
                 "audioId": $("#audio_item_form").attr("data-audio-id"),
                 "artistName": s.artistNameRef.val(),
                 "audioTitle": s.audioTitleRef.val(),
-                "audioLocation": s.audioFileRef.data("file-name"),
+                "audioFile": s.audioFileRef.data("file-name"),
                 "audioDuration": editAudioItems.getSeconds(s.audioDurationRef.val()),
                 "audioIn": editAudioItems.getSeconds(s.audioInRef.val()),
                 "audioOut": editAudioItems.getSeconds(s.audioOutRef.val()),

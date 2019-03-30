@@ -183,7 +183,7 @@ namespace RadioPlayout.Controllers
 			}
 
 			// Get the scheduleClockItems from the database
-			var scheduleClockItems = _db.ScheduleClockItems.Where(c => c.ScheduleClock.ScheduleClockId.Equals(1)).ToList();
+			var scheduleClockItems = _db.ScheduleClockItems.Where(c => c.ScheduleClock.ScheduleClockId.Equals(scheduleClockIdInt)).ToList();
 
 			// If any scheduleClockItems were returned
 			if (scheduleClockItems.Any())

@@ -94,6 +94,8 @@
         });
 
         $(".schedule_clock_item_remove").one("click", function (e) {
+            console.log("This");
+
             // Stop the click propogating up the DOM
             e.stopImmediatePropagation();
             // Pass the GUI index to the remove schedule clock item
@@ -317,6 +319,9 @@
 
         // Set the name of the Schedule Clock
         $("#schedule_clock_name").val(scheduleClockName);
+
+        // Rebind the ui actions after adding the schedule clock items
+        scheduleClock.bindUIAction();
     },
     submitScheduleClock: function () {
         // This should only run if the form has been validated

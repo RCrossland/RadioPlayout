@@ -9,6 +9,7 @@ using System.Net;
 using System.IO;
 using System.Web.Hosting;
 using Microsoft.AspNet.Identity;
+using System.Text.RegularExpressions;
 
 namespace RadioPlayout.Controllers
 {
@@ -265,17 +266,20 @@ namespace RadioPlayout.Controllers
 		/// <param name="audioType">The audio type id of the audio item. This will be converted to an integer.</param>
 		/// <returns>A Json object with '200' if the audio item was successfully added.</returns>
 		[HttpPost]
-		public ActionResult AddNewAudioItem(string artistName, string audioTitle, string audioLocation, string audioDuration,
+		public ActionResult AddNewAudioItem(string artistName, string audioTitle, string audioFile, string audioDuration,
 			string audioIn, string audioOut, string audioReleaseYear, string audioType)
 		{
 			errorDict.Clear();
 
+			// Remove special characters from audioFile
+			audioFile = RemoveSpecialCharacters(audioFile);
+
 			// Placeholders for the audio upload paths
-			string uploadPath = uploadAudioDirectory + audioLocation;
-			string audioPath = audioDirectory + audioLocation;
+			string uploadPath = uploadAudioDirectory + audioFile;
+			string audioPath = audioDirectory + audioFile;
 
 			// Dictionary to hold key value error pairs
-			ValidateAudioItems(artistName, audioTitle, audioLocation, uploadPath, audioPath, audioDuration, audioIn, audioOut, audioReleaseYear, audioType);
+			ValidateAudioItems(artistName, audioTitle, audioFile, uploadPath, audioPath, audioDuration, audioIn, audioOut, audioReleaseYear, audioType);
 
 			if (errorDict.Count > 0)
 			{
@@ -322,7 +326,7 @@ namespace RadioPlayout.Controllers
 				{
 					ArtistName = artistName,
 					AudioTitle = audioTitle,
-					AudioLocation = audioLocation,
+					AudioLocation = audioFile,
 					AudioDuration = Int32.Parse(audioDuration),
 					AudioIn = Int32.Parse(audioIn),
 					AudioOut = Int32.Parse(audioOut),
@@ -352,17 +356,20 @@ namespace RadioPlayout.Controllers
 		/// <param name="audioType">The new audio type id for the audio item.</param>
 		/// <returns></returns>
 		[HttpPost]
-		public ActionResult UpdateAudioItem(string audioId, string artistName, string audioTitle, string audioLocation, string audioDuration,
+		public ActionResult UpdateAudioItem(string audioId, string artistName, string audioTitle, string audioFile, string audioDuration,
 			string audioIn, string audioOut, string audioReleaseYear, string audioType)
 		{
 			errorDict.Clear();
 
+			// Remove special characters from the file input
+			audioFile = RemoveSpecialCharacters(audioFile);
+
 			// Placeholders for the audio upload paths
-			string uploadPath = uploadAudioDirectory + audioLocation;
-			string audioPath = audioDirectory + audioLocation;
+			string uploadPath = uploadAudioDirectory + audioFile;
+			string audioPath = audioDirectory + audioFile;
 
 			// Dictionary to hold key value error pairs
-			ValidateAudioItems(artistName, audioTitle, audioLocation, uploadPath, audioPath, audioDuration, audioIn, audioOut, audioReleaseYear, audioType);
+			ValidateAudioItems(artistName, audioTitle, audioFile, uploadPath, audioPath, audioDuration, audioIn, audioOut, audioReleaseYear, audioType);
 
 			// Check whether the audioID exists
 			// Placeholder for the audioIDInt
@@ -410,7 +417,7 @@ namespace RadioPlayout.Controllers
 				{
 					audioItem.ArtistName = artistName;
 					audioItem.AudioTitle = audioTitle;
-					audioItem.AudioLocation = audioLocation;
+					audioItem.AudioLocation = audioFile;
 					audioItem.AudioDuration = Int32.Parse(audioDuration);
 					audioItem.AudioIn = Int32.Parse(audioIn);
 					audioItem.AudioOut = Int32.Parse(audioOut);
@@ -436,13 +443,13 @@ namespace RadioPlayout.Controllers
 			{
 				HttpPostedFileBase file = Request.Files[0];
 				int fileSize = file.ContentLength;
-				string fileName = file.FileName;
+				string fileName = RemoveSpecialCharacters(file.FileName);
 				string mimeType = file.ContentType;
 				string filePath = "/Content/Audio/Upload/" + fileName;
 
 				file.SaveAs(Server.MapPath(filePath));
 
-				return Json(filePath);
+				return Json(filePath, JsonRequestBehavior.AllowGet);
 			}
 			else
 			{
@@ -503,6 +510,16 @@ namespace RadioPlayout.Controllers
 				Response.StatusCode = (int)HttpStatusCode.OK;
 				return Json("Success");
 			}
+		}
+
+		/// <summary>
+		/// Remove special characters and spaces from the inputted string. 
+		/// </summary>
+		/// <param name="inputString">String to remove the special characters from.</param>
+		/// <returns></returns>
+		public string RemoveSpecialCharacters(string inputString)
+		{
+			return Regex.Replace(inputString, "[^a-zA-Z0-9_.]+", "", RegexOptions.Compiled); ;
 		}
 	}
 }

@@ -724,7 +724,7 @@ const schedule = {
         })
     },
     loadScheduleClockItems: function (scheduleClock) {
-        $(".schedule_content_items_outer").empty();
+        $("#schedule_content_items_outer").empty();
 
         $.each(scheduleClock, function (key, value) {
             let scheduleItemHTML = "";

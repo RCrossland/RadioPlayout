@@ -24,6 +24,8 @@ let weather = {
                 let tempCaptured = [];
                 let weatherCaptured = [];
 
+                console.log(data);
+
                 $.each(data.list, function (index, element) {
                     let date = element.dt_txt.split(" ")[0];
 
