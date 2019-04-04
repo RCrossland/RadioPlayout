@@ -511,29 +511,37 @@ const radioPlayout = {
         });
     },
     webcast: function () {
-        let encoder = new Webcast.Encoder.Mp3({
+        //WebCaster.js API
+        // Initialise an MP3 encoder
+        var encoder = new Webcast.Encoder.Mp3({
             channels: 2,
             samplerate: 44100,
             bitrate: 128
         });
-
-        console.log("Encoder loaded");
+        // If the Web Audio API sample rate is not equal to 44100, resample the encoder
+        if (audioContext.sampleRate !== 44100) {
+            encoder = new Webcast.Encoder.Resample({
+                encoder: encoder,
+                samplerate: audioContext.sampleRate
+            });
+        }
 
         let webcast = s.radioPlayout1AudioContext.createWebcastSource(4096, 2);
 
-        webcast.connect(s.radioPlayout1AudioContext.destination);
+        // Add the final Web Audio API node to the webcast
+        webcast.connect(audioContext.destination);
+        // Connect the webcast to the web socket
         webcast.connectSocket(encoder, "ws://source:hackme@51.141.107.156:8080/mount");
-
-        console.log("Socket should of connected");
     }
 };
 
 const pressToTalk = {
     settings: {
-
+        microphoneInput: null
     },
     init: function () {
         pressToTalk.bindUIActions();
+        pressToTalk.getUserMicrophone();
     },
     bindUIActions: function () {
         $(".press_to_talk_button").click(function () {
@@ -549,21 +557,33 @@ const pressToTalk = {
             $("#press_to_talk_modal").modal("show");
 
             pressToTalk.getUserMicrophone();
-        })
+        });
+
+        $("#select_local_microphone_btn").click(function () {
+            $("#press_to_talk_modal").modal("hide");
+        });
     },
     getUserMicrophone: function () {
         navigator.mediaDevices.enumerateDevices().then((devices) => {
             navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(
                 devices = devices.filter((d) => d.kind === 'audioinput'));
 
-            $("#user_microphone_select").empty();
-
+            let microphone_html = "";
             $.each(devices, function (key, value) {
-                let microphone_html = "<option value=" + key + ">" + value.label + "</option>";
-
-                $("#user_microphone_select").append(microphone_html);
+                if (value.label != "") {
+                    microphone_html = microphone_html + "<option value=" + key + ">" + value.label + "</option>";
+                }
             });
-        })
+
+            if (microphone_html != "") {
+                $("#user_microphone_select").empty();
+                $("#user_microphone_select").append(microphone_html);
+            }
+            else {
+                $("#user_microphone_select").empty();
+                $("#user_microphone_select").append("<option selected disabled>No microphones found.</option>");
+            }
+        });
     }
 }
 

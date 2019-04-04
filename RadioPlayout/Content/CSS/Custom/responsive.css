@@ -35,4 +35,11 @@
 
 /* Extra large devices (large laptops and desktops, 1200px and up) */
 @media only screen and (min-width: 1200px) {
+	.radio_player_card_outer {
+		height: 14em;
+	}
+
+	.schedule_content_outer{
+		height: 28em
+	}
 }
