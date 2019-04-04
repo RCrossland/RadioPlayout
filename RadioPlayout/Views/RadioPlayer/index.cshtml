@@ -14,8 +14,19 @@
 	<script src="~/Scripts/Custom/radio_playout.js"></script>
 }
 
-@Html.Partial("EnterRadioPlayerModal")
-@Html.Partial("MusicCatalogueModal")
+@section top_nav_extra
+{
+	<div class="top_navigation_switch_outer">
+		<i class="fas fa-toggle-on toggle_connection_switch pointer fa-rotate-180"></i> <span class="toggle_connection_text">Connect to stream</span>
+	</div>
+
+	<div class="top_navigation_switch_outer ml-4">
+		<i class="fas fa-toggle-on auto_dj_switch pointer fa-rotate-180"></i> <span class="auto_dj_switch_text">Auto DJ</span>
+	</div>
+}
+
+@Html.Partial("_EnterRadioPlayerModal")
+@Html.Partial("_MusicCatalogueModal")
 @Html.Partial("_PressToTalkModal")
 
 <div class="container-fluid">

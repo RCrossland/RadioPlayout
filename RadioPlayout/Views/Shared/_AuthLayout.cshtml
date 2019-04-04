@@ -98,10 +98,7 @@
 <!-- Top Navigation Panel -->
 <div class="top_navigation">
 	<div class="top_navigation_content float-right d-flex align-items-center">
-		<div class="top_navigation_switch_outer">
-			<i class="fas fa-toggle-on auto_dj_switch pointer fa-rotate-180"></i> <span class="auto_dj_switch_text">Auto DJ</span>
-		</div>
-
+		@RenderSection("top_nav_extra", required: false)
 		<div class="vl float-left"></div>
 
 		<div class="top_navigation_date float-right">

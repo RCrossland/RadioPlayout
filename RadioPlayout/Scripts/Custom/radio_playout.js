@@ -29,6 +29,7 @@ const radioPlayout = {
         autoDJ: false,
 
         radioPlayerAudioContext: null,
+        radioPlayerWebCast: null,
 
         radioPlayer1Locked: false,
         radioPlayer1AudioRef: null,
@@ -129,6 +130,22 @@ const radioPlayout = {
                 $(this).addClass("fa-rotate-180");
 
                 s.autoDJ = false;
+            }
+        });
+
+        $(".toggle_connection_switch").click(function () {
+            if ($(this).hasClass("fa-rotate-180")) {
+                // Webcast connection has been activated
+                $(this).css("color", "green");
+                $(this).removeClass("fa-rotate-180");
+
+                radioPlayout.connectWebcast();
+            }
+            else {
+                // Webcast connection has been disabled
+                $(this).css("color", "red");
+                $(this).addClass("fa-rotate-180");
+
             }
         });
     },
@@ -513,7 +530,7 @@ const radioPlayout = {
         let minutesAndSeconds = minutes.toString() + "." + seconds.toString();
         return minutesAndSeconds;
     },
-    webcast: function () {
+    connectWebcast: function() {
         //WebCaster.js API
         // Initialise an MP3 encoder
         var encoder = new Webcast.Encoder.Mp3({
@@ -530,15 +547,15 @@ const radioPlayout = {
         }
 
         // Add a webcast source to the Web Audio API audio context
-        var webcast = s.radioPlayerAudioContext.createWebcastSource(4096, 2);
+        s.radioPlayerWebCast = s.radioPlayerAudioContext.createWebcastSource(4096, 2);
         // Add the track to the webcast
-        s.radioPlayer1ElementSource.connect(webcast);
-        s.radioPlayer2ElementSource.connect(webcast);
+        s.radioPlayer1ElementSource.connect(s.radioPlayerWebCast);
+        s.radioPlayer2ElementSource.connect(s.radioPlayerWebCast);
         // Add the final Web Audio API node to the webcast
-        webcast.connect(s.radioPlayerAudioContext.destination);
+        s.radioPlayerWebCast.connect(s.radioPlayerAudioContext.destination);
         // Connect the webcast to the web socket
-        webcast.connectSocket(encoder, "ws://source:hackme@51.141.113.47:8080/mount");
-    }
+        s.radioPlayerWebCast.connectSocket(encoder, "ws://source:hackme@51.141.104.113:8080/mount");
+    },
 }
 
 const pressToTalk = {
@@ -556,8 +573,8 @@ const pressToTalk = {
             }
             else {
                 $(this).addClass("mic_live");
-
-                radioPlayout.webcast();
+                let microphone_key = $('#user_microphone_select').find(":selected").val();
+                pressToTalk.connectUserMicrophone(microphone_key);
             }
         });
 
@@ -591,6 +608,22 @@ const pressToTalk = {
                 $("#user_microphone_select").empty();
                 $("#user_microphone_select").append("<option selected disabled>No microphones found.</option>");
             }
+        });
+    },
+    connectUserMicrophone: function (microphone_id) {
+        navigator.mediaDevices.getUserMedia({
+            audio: {
+                deviceId: microphone_id,
+            }
+        }).then((stream) => {
+            microphoneStream = radioPlayout.settings.radioPlayerAudioContext.createMediaStreamSource(stream);
+            microphoneStream.connect(radioPlayout.settings.radioPlayerAudioContext.destination);
+            microphoneStream.connect(radioPlayout.settings.radioPlayerWebCast);
+
+            $(".press_to_talk_button").click(function () {
+                    microphoneStream.disconnect(radioPlayout.settings.radioPlayerAudioContext.destination);
+                    microphoneStream.disconnect(radioPlayout.settings.radioPlayerWebCast);
+            });
         });
     }
 }

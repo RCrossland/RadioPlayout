@@ -158,11 +158,11 @@
 	margin: 0;
 }
 
-.auto_dj_switch {
+.auto_dj_switch, .toggle_connection_switch {
 	color: red;
 }
 
-.auto_dj_switch_text {
+.auto_dj_switch_text, .toggle_connection_text {
 	color: #FFFFFF;
 }
 
