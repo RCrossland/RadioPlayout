@@ -15,7 +15,7 @@ const enterRadioPlayoutModal = {
     },
     bindUIAction: function () {
         $("#enter_radio_playout_button").click(function () {
-            radioPlayout.setPlayerAudioContext();
+            radioPlayout.init();
             $("#enter_radio_playout_modal").modal('hide');
         });
     },
@@ -28,55 +28,34 @@ const radioPlayout = {
     settings: {
         autoDJ: false,
 
+        radioPlayerAudioContext: null,
+
         radioPlayer1Locked: false,
+        radioPlayer1AudioRef: null,
+        radioPlayer1ElementSource: null,
+        radioPlayer1SongDuration: null,
+
         radioPlayer2Locked: false,
-
-        radioPlayout1SongDuration: 10,
-        radioPlayout2SongDuration: 0.00,
-
-        radioPlayout1AudioRef: null,
-        radioPlayout2AudioRef: null,
-
-        radioPlayout1AudioContext: null,
-        radioPlayout1Analyser: null,
-        radioPlayout1ScriptProcessor: null,
-        radioPlayout1ElementSource: null,
-
-        radioPlayout2AudioContext: null,
-        radioPlayout2Analyser: null,
-        radioPlayout2ScriptProcessor: null,
-        radioPlayout2ElementSource: null
+        radioPlayer2AudioRef: null,
+        radioPlayer2ElementSource: null,
+        radioPlayer2SongDuration: null
     },
     init: function () {
         s = radioPlayout.settings;
 
-        radioPlayout.bindUIAction();
+        radioPlayout.createAudioContext();
+        radioPlayout.createRadioPlayer1AudioNode();
+        radioPlayout.createRadioPlayer2AudioNode();
+
+        radioPlayout.bindUIActions();
     },
-    bindUIAction: function () {
-        $("#radio_player_1_duration_bar").click(function (e) {
-            radioPlayout.clickSongDuration($(this), e, s.radioPlayout1SongDuration, s.radioPlayout1AudioRef);
-        });
-
-        $("#radio_player_2_duration_bar").click(function (e) {
-            radioPlayout.clickSongDuration($(this), e, s.radioPlayout2SongDuration, s.radioPlayout2AudioRef);
-        });
-
+    bindUIActions: function () {
         $("#radio_player_1_play").click(function (e) {
-            s.radioPlayout1ElementSource.connect(s.radioPlayout1Analyser);
-            s.radioPlayout1Analyser.connect(s.radioPlayout1ScriptProcessor);
-            s.radioPlayout1ElementSource.connect(s.radioPlayout1AudioContext.destination);
-            s.radioPlayout1ScriptProcessor.connect(s.radioPlayout1AudioContext.destination);
-
-            s.radioPlayout1AudioRef.play();
+            s.radioPlayer1AudioRef.play();
         });
 
         $("#radio_player_1_pause").click(function (e) {
-            s.radioPlayout1ElementSource.disconnect(s.radioPlayout1Analyser);
-            s.radioPlayout1Analyser.disconnect(s.radioPlayout1ScriptProcessor);
-            s.radioPlayout1ElementSource.disconnect(s.radioPlayout1AudioContext.destination);
-            s.radioPlayout1ScriptProcessor.disconnect(s.radioPlayout1AudioContext.destination);
-
-            s.radioPlayout1AudioRef.pause();
+            s.radioPlayer1AudioRef.pause();
         });
 
         $("#radio_player_1_eject").click(function () {
@@ -84,36 +63,31 @@ const radioPlayout = {
         });
 
         $("#radio_player_1_volume_slider").on('input', function (e) {
-            s.radioPlayout1AudioRef.volume = ($(this)[0].value / 100);
+            s.radioPlayer1AudioRef.volume = ($(this)[0].value / 100);
+        });
+
+        $("#radio_player_1_duration_bar").click(function (e) {
+            radioPlayout.clickSongDuration($(this), e, s.radioPlayer1SongDuration, s.radioPlayer1AudioRef);
         });
 
         $("#radio_player_2_play").click(function (e) {
-            s.radioPlayout2ElementSource.connect(s.radioPlayout2Analyser);
-            s.radioPlayout2Analyser.connect(s.radioPlayout2ScriptProcessor);
-            s.radioPlayout2ElementSource.connect(s.radioPlayout2AudioContext.destination);
-            s.radioPlayout2ScriptProcessor.connect(s.radioPlayout2AudioContext.destination);
-
-            s.radioPlayout2AudioRef.play();
-        }),
+            s.radioPlayer2AudioRef.play();
+        });
 
         $("#radio_player_2_pause").click(function (e) {
-                s.radioPlayout2ElementSource.disconnect(s.radioPlayout2Analyser);
-                s.radioPlayout2Analyser.disconnect(s.radioPlayout2ScriptProcessor);
-                s.radioPlayout2ElementSource.disconnect(s.radioPlayout2AudioContext.destination);
-                s.radioPlayout2ScriptProcessor.disconnect(s.radioPlayout2AudioContext.destination);
-
-                s.radioPlayout2AudioRef.pause();
-            });
+            s.radioPlayer2AudioRef.pause();
+        });
 
         $("#radio_player_2_eject").click(function () {
             radioPlayout.clearRadioPlayer2();
         });
 
-        $("#radio_player_2_volume_slider").change(function (e) {
-            s.radioPlayout2AudioRef.volume = ($(this)[0].value / 100);
+        $("#radio_player_2_volume_slider").on('input', function (e) {
+            s.radioPlayer2AudioRef.volume = ($(this)[0].value / 100);
         });
 
-        $(".push_to_talk_button").click(function () {
+        $("#radio_player_2_duration_bar").click(function (e) {
+            radioPlayout.clickSongDuration($(this), e, s.radioPlayer2SongDuration, s.radioPlayer2AudioRef);
         });
 
         $(".radio_player_outer").on('dragover', function (e) {
@@ -140,55 +114,70 @@ const radioPlayout = {
                 });
             }
         });
-    },
-    getTrackData: function (audioId, callbackFunction) {
-        $.ajax({
-            url: $("#music_catalogue_outer").data("request-url"),
-            type: "POST",
-            data: { "audioId": audioId },
-            success: function (result) {
-                callbackFunction(result[0]);
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.log("Unable to retrieve track information.");
-                //or you can put jqXHR.responseText somewhere as complete response. Its html.
+
+        $(".auto_dj_switch").click(function () {
+            if ($(this).hasClass("fa-rotate-180")) {
+                // Auto DJ has been turned on
+                $(this).css("color", "green");
+                $(this).removeClass("fa-rotate-180");
+
+                s.autoDJ = true;
             }
-        })
+            else {
+                // Auto DJ has been turned off
+                $(this).css("color", "red");
+                $(this).addClass("fa-rotate-180");
+
+                s.autoDJ = false;
+            }
+        });
     },
-    setPlayerAudioContext: function () {
+    createAudioContext: function () {
         // For legacy browsers
         const AudioContext = window.AudioContext || window.webkitAudioContext;
 
-        radioPlayout.init();
+        // Initialise an Audio Context node
+        s.radioPlayerAudioContext = new AudioContext();
+    },
+    createRadioPlayer1AudioNode: function () {
+        // Initialise a new Audio object
+        s.radioPlayer1AudioRef = new Audio("/Content/Audio/01SoAmI.mp3");
+        // Set the default value of the audio to 90%
+        s.radioPlayer1AudioRef.volume = 0.95;
 
-        s.radioPlayout1AudioRef = $("#radio_player_1_audio")[0];
-        s.radioPlayout1AudioContext = new AudioContext();
+        // Create a new AudioContext element source from the Player 1 Audio
+        s.radioPlayer1ElementSource = s.radioPlayerAudioContext.createMediaElementSource(s.radioPlayer1AudioRef);
+
+        s.radioPlayer1ElementSource.connect(s.radioPlayerAudioContext.destination);
+
         radioPlayout.setPlayer1Analyser();
+    },
+    createRadioPlayer2AudioNode: function () {
+        // Initialise a new Audio object
+        s.radioPlayer2AudioRef = new Audio("/Content/Audio/02NoOne.mp3");
+        // Set the default value of the audio to 90%
+        s.radioPlayer2AudioRef.volume = 0.95;
 
-        s.radioPlayout2AudioRef = $("#radio_player_2_audio")[0];
-        s.radioPlayout2AudioContext = new AudioContext();
+        // Create a new AudioContext element source from the Player 1 Audio
+        s.radioPlayer2ElementSource = s.radioPlayerAudioContext.createMediaElementSource(s.radioPlayer2AudioRef);
+
+        s.radioPlayer2ElementSource.connect(s.radioPlayerAudioContext.destination);
+
         radioPlayout.setPlayer2Analyser();
-
-        radioPlayout.loadCurrentTrack();
-
-        radioPlayout.webcast();
     },
     setPlayer1Analyser: function () {
-        // Reference the radioPlayout1 to allow the audio context to manipulate the output.
-        s.radioPlayout1ElementSource = s.radioPlayout1AudioContext.createMediaElementSource(s.radioPlayout1AudioRef);
+        // Create a new analyser from the audio context
+        let radioPlayer1Analyser = s.radioPlayerAudioContext.createAnalyser();
+        // Create a new script processor from the audio context
+        let radioPlayout1ScriptProcessor = s.radioPlayerAudioContext.createScriptProcessor(2048, 1, 1);
 
-        // Creates an analyser which is to be used to expose audio time and frequency data.
-        s.radioPlayout1Analyser = s.radioPlayout1AudioContext.createAnalyser();
-        // s.radioPlayout1Analyser.smoothingTimeConstant = 0.3;
-        // s.radioPlayout1Analyser.fftSize = 1024;
-
-        // Allows the generation processing or analysing of audio data. (buffer_size, no. of input channels, no. of output channels)
-        s.radioPlayout1ScriptProcessor = s.radioPlayout1AudioContext.createScriptProcessor(2048, 1, 1);
         // Loops over each channel of the input stream. This will be at '1' as specified above.
-        s.radioPlayout1ScriptProcessor.onaudioprocess = function () {
-            var array = new Uint8Array(s.radioPlayout1Analyser.frequencyBinCount);
-            s.radioPlayout1Analyser.getByteFrequencyData(array);
+        radioPlayout1ScriptProcessor.onaudioprocess = function () {
+            // Get the bit count from the analyser
+            var array = new Uint8Array(radioPlayer1Analyser.frequencyBinCount);
+            radioPlayer1Analyser.getByteFrequencyData(array);
 
+            // Calculate the average bit count
             let averageFrequencyDataPercentage = Math.average(array);
 
             if (averageFrequencyDataPercentage > 95) {
@@ -200,8 +189,7 @@ const radioPlayout = {
                 $("#radio_player_1_volume_level").children(".progress_bar").removeClass("bg-danger").addClass("bg-success");
             }
 
-            // When the song has finished, clear the player
-            if (s.radioPlayout1AudioRef.currentTime == s.radioPlayout1SongDuration) {
+            if (s.radioPlayer1AudioRef.currentTime >= s.radioPlayer1SongDuration) {
                 radioPlayout.clearRadioPlayer1();
             }
         };
@@ -222,23 +210,24 @@ const radioPlayout = {
             average = sum / numbers.length;
             return average;
         };
+
+        s.radioPlayer1ElementSource.connect(radioPlayer1Analyser);
+        radioPlayout1ScriptProcessor.connect(s.radioPlayerAudioContext.destination);
+        radioPlayer1Analyser.connect(radioPlayout1ScriptProcessor);
     },
     setPlayer2Analyser: function () {
-        // Reference the radioPlayout1 to allow the audio context to manipulate the output.
-        s.radioPlayout2ElementSource = s.radioPlayout2AudioContext.createMediaElementSource(s.radioPlayout2AudioRef);
+        // Create a new analyser from the audio context
+        let radioPlayer2Analyser = s.radioPlayerAudioContext.createAnalyser();
+        // Create a new script processor from the audio context
+        let radioPlayout2ScriptProcessor = s.radioPlayerAudioContext.createScriptProcessor(2048, 1, 1);
 
-        // Creates an analyser which is to be used to expose audio time and frequency data.
-        s.radioPlayout2Analyser = s.radioPlayout2AudioContext.createAnalyser();
-        // s.radioPlayout1Analyser.smoothingTimeConstant = 0.3;
-        // s.radioPlayout1Analyser.fftSize = 1024;
-
-        // Allows the generation processing or analysing of audio data. (buffer_size, no. of input channels, no. of output channels)
-        s.radioPlayout2ScriptProcessor = s.radioPlayout2AudioContext.createScriptProcessor(2048, 1, 1);
         // Loops over each channel of the input stream. This will be at '1' as specified above.
-        s.radioPlayout2ScriptProcessor.onaudioprocess = function () {
-            var array = new Uint8Array(s.radioPlayout2Analyser.frequencyBinCount);
-            s.radioPlayout2Analyser.getByteFrequencyData(array);
+        radioPlayout2ScriptProcessor.onaudioprocess = function () {
+            // Get the bit count from the analyser
+            var array = new Uint8Array(radioPlayer2Analyser.frequencyBinCount);
+            radioPlayer2Analyser.getByteFrequencyData(array);
 
+            // Calculate the average bit count
             let averageFrequencyDataPercentage = Math.average(array);
 
             if (averageFrequencyDataPercentage > 95) {
@@ -250,7 +239,7 @@ const radioPlayout = {
                 $("#radio_player_2_volume_level").children(".progress_bar").removeClass("bg-danger").addClass("bg-success");
             }
 
-            if (s.radioPlayout2AudioRef.currentTime == s.radioPlayout2SongDuration) {
+            if (s.radioPlayer2AudioRef.currentTime == s.radioPlayer2SongDuration) {
                 radioPlayout.clearRadioPlayer2();
             }
         };
@@ -271,30 +260,35 @@ const radioPlayout = {
             average = sum / numbers.length;
             return average;
         };
+
+        s.radioPlayer2ElementSource.connect(radioPlayer2Analyser);
+        radioPlayout2ScriptProcessor.connect(s.radioPlayerAudioContext.destination);
+        radioPlayer2Analyser.connect(radioPlayout2ScriptProcessor);
     },
     loadPlayer1Track: function (trackData) {
-        s.radioPlayout1AudioRef.setAttribute('src', "Content/Audio/" + trackData.AudioLocation);
+        // Set the audio track source
+        s.radioPlayer1AudioRef.setAttribute('src', "Content/Audio/" + trackData.AudioLocation);
 
-        s.radioPlayout1AudioRef.onloadeddata = function () {
+        // When the track has loaded
+        s.radioPlayer1AudioRef.onloadeddata = function () {
             s.radioPlayer1Locked = true;
-            s.radioPlayout1AudioRef.volume = 0.75;
-            s.radioPlayout1SongDuration = s.radioPlayout1AudioRef.duration;
+            s.radioPlayer1AudioRef.volume = 0.75;
+            s.radioPlayer1SongDuration = s.radioPlayer1AudioRef.duration;
             $("#radio_player_1_artist_name").text(trackData.ArtistName);
             $("#radio_player_1_song_title").text(trackData.AudioTitle);
-            $("#radio_player_1_duration").text(radioPlayout.convertSecondsToMinutes(s.radioPlayout1SongDuration));
+            $("#radio_player_1_duration").text(radioPlayout.convertSecondsToMinutes(s.radioPlayer1SongDuration));
 
 
-            $(s.radioPlayout1AudioRef).on('timeupdate', function () {
-                let currentTime = radioPlayout.convertSecondsToMinutes(s.radioPlayout1AudioRef.currentTime);
-                let timeRemaining = radioPlayout.convertSecondsToMinutes(s.radioPlayout1SongDuration - s.radioPlayout1AudioRef.currentTime);
+            $(s.radioPlayer1AudioRef).on('timeupdate', function () {
+                let timeRemaining = radioPlayout.convertSecondsToMinutes(s.radioPlayer1SongDuration - s.radioPlayer1AudioRef.currentTime);
 
                 // When the intro to the track is playing display green
-                if (trackData.AudioIn > 0 && trackData.AudioIn > s.radioPlayout1AudioRef.currentTime) {
-                    $("#radio_player_1_duration").text(radioPlayout.convertSecondsToMinutes(trackData.AudioIn - s.radioPlayout1AudioRef.currentTime));
+                if (trackData.AudioIn > 0 && trackData.AudioIn > s.radioPlayer1AudioRef.currentTime) {
+                    $("#radio_player_1_duration").text(radioPlayout.convertSecondsToMinutes(trackData.AudioIn - s.radioPlayer1AudioRef.currentTime));
                     $("#radio_player_1_duration").css("background-color", "green");
                 }
                 // When the outro to the track is playing display red
-                else if (trackData.AudioOut > 0 && trackData.AudioOut > (s.radioPlayout1AudioRef.duration - s.radioPlayout1AudioRef.currentTime)) {
+                else if (trackData.AudioOut > 0 && trackData.AudioOut < (s.radioPlayer1AudioRef.currentTime)) {
                     $("#radio_player_1_duration").text(timeRemaining);
                     $("#radio_player_1_duration").css("background-color", "red");
                 }
@@ -303,33 +297,35 @@ const radioPlayout = {
                     $("#radio_player_1_duration").text(timeRemaining);
                 }
 
-                $("#radio_player_1_duration_bar").children(".progress-bar").css({ "width": (s.radioPlayout1AudioRef.currentTime / s.radioPlayout1SongDuration) * 100 + "%" });
-                $("#radio_player_1_duration_bar").children(".progress-bar").text(radioPlayout.convertSecondsToMinutes(s.radioPlayout1AudioRef.currentTime));
+                $("#radio_player_1_duration_bar").children(".progress-bar").css({ "width": (s.radioPlayer1AudioRef.currentTime / s.radioPlayer1SongDuration) * 100 + "%" });
+                $("#radio_player_1_duration_bar").children(".progress-bar").text(radioPlayout.convertSecondsToMinutes(s.radioPlayer1AudioRef.currentTime));
             });
         };
     },
     loadPlayer2Track: function (trackData) {
-        s.radioPlayout2AudioRef.setAttribute('src', "Content/Audio/" + trackData.AudioLocation);
+        // Set the audio track source
+        s.radioPlayer2AudioRef.setAttribute('src', "Content/Audio/" + trackData.AudioLocation);
 
-        s.radioPlayout2AudioRef.onloadeddata = function () {
+        // When the track has loaded
+        s.radioPlayer2AudioRef.onloadeddata = function () {
             s.radioPlayer2Locked = true;
-            s.radioPlayout2AudioRef.volume = 0.75;
-            s.radioPlayout2SongDuration = s.radioPlayout2AudioRef.duration;
+            s.radioPlayer2AudioRef.volume = 0.75;
+            s.radioPlayer2SongDuration = s.radioPlayer2AudioRef.duration;
             $("#radio_player_2_artist_name").text(trackData.ArtistName);
             $("#radio_player_2_song_title").text(trackData.AudioTitle);
-            $("#radio_player_2_duration").text(radioPlayout.convertSecondsToMinutes(s.radioPlayout2SongDuration));
+            $("#radio_player_2_duration").text(radioPlayout.convertSecondsToMinutes(s.radioPlayer2SongDuration));
 
-            $(s.radioPlayout2AudioRef).on('timeupdate', function () {
-                let currentTime = radioPlayout.convertSecondsToMinutes(s.radioPlayout2AudioRef.currentTime);
-                let timeRemaining = radioPlayout.convertSecondsToMinutes(s.radioPlayout2SongDuration - s.radioPlayout2AudioRef.currentTime);
+
+            $(s.radioPlayer2AudioRef).on('timeupdate', function () {
+                let timeRemaining = radioPlayout.convertSecondsToMinutes(s.radioPlayer2SongDuration - s.radioPlayer2AudioRef.currentTime);
 
                 // When the intro to the track is playing display green
-                if (trackData.AudioIn > 0 && trackData.AudioIn > s.radioPlayout2AudioRef.currentTime) {
-                    $("#radio_player_2_duration").text(radioPlayout.convertSecondsToMinutes(trackData.AudioIn - s.radioPlayout2AudioRef.currentTime));
+                if (trackData.AudioIn > 0 && trackData.AudioIn > s.radioPlayer2AudioRef.currentTime) {
+                    $("#radio_player_2_duration").text(radioPlayout.convertSecondsToMinutes(trackData.AudioIn - s.radioPlayer2AudioRef.currentTime));
                     $("#radio_player_2_duration").css("background-color", "green");
                 }
                 // When the outro to the track is playing display red
-                else if (trackData.AudioOut > 0 && trackData.AudioOut > (s.radioPlayout2AudioRef.duration - s.radioPlayout2AudioRef.currentTime)) {
+                else if (trackData.AudioOut > 0 && trackData.AudioOut < (s.radioPlayer2AudioRef.currentTime)) {
                     $("#radio_player_2_duration").text(timeRemaining);
                     $("#radio_player_2_duration").css("background-color", "red");
                 }
@@ -338,14 +334,14 @@ const radioPlayout = {
                     $("#radio_player_2_duration").text(timeRemaining);
                 }
 
-                $("#radio_player_2_duration_bar").children(".progress-bar").css({ "width": (s.radioPlayout2AudioRef.currentTime / s.radioPlayout2SongDuration) * 100 + "%" });
-                $("#radio_player_2_duration_bar").children(".progress-bar").text(radioPlayout.convertSecondsToMinutes(s.radioPlayout2AudioRef.currentTime));
+                $("#radio_player_2_duration_bar").children(".progress-bar").css({ "width": (s.radioPlayer2AudioRef.currentTime / s.radioPlayer2SongDuration) * 100 + "%" });
+                $("#radio_player_2_duration_bar").children(".progress-bar").text(radioPlayout.convertSecondsToMinutes(s.radioPlayer2AudioRef.currentTime));
             });
         };
     },
     clearRadioPlayer1: function () {
         // Remove the attributes from Radio Player 1
-        s.radioPlayout1AudioRef.removeAttribute("src");
+        s.radioPlayer1AudioRef.removeAttribute("src");
         $("#radio_player_1_artist_name").text("Player Waiting For Audio");
         $("#radio_player_1_song_title").html("<br>");
         $("#radio_player_1_duration").text("00:00:00");
@@ -358,7 +354,7 @@ const radioPlayout = {
     },
     clearRadioPlayer2: function () {
         // Remove the attributes from Radio Player 2
-        s.radioPlayout2AudioRef.removeAttribute("src");
+        s.radioPlayer2AudioRef.removeAttribute("src");
         $("#radio_player_2_artist_name").text("Player Waiting For Audio");
         $("#radio_player_2_song_title").html("<br>");
         $("#radio_player_2_duration").text("00:00:00");
@@ -383,13 +379,6 @@ const radioPlayout = {
         songDurationBar.children(".progress-bar").css({ "width": percentage + "%" });
         songDurationBar.children(".progress-bar").text(songPositionCombined);
     },
-    convertSecondsToMinutes: function (durationSeconds) {
-        let minutes = parseInt(durationSeconds / 60);
-        let seconds = parseInt(durationSeconds % 60) < 10 ? "0" + parseInt(durationSeconds % 60).toString() : parseInt(durationSeconds % 60);
-
-        let minutesAndSeconds = minutes.toString() + "." + seconds.toString();
-        return minutesAndSeconds;
-    },
     loadCurrentTrack: function () {
         // Find the track that has the ID of 'current_track' and get the audio_id
         let currentTrackId = $(".current_track").data("audio_id");
@@ -402,14 +391,14 @@ const radioPlayout = {
                 radioPlayout.loadPlayer1Track(currentTrackData);
 
                 // Once the track has been loaded run the rest of the schedule items
-                radioPlayout.runScheduleItems(s.radioPlayout1AudioRef);
+                radioPlayout.runScheduleItems(s.radioPlayer1AudioRef);
             }
             else if (!s.radioPlayer2Locked) {
                 // Pass the track data in order for it to be loaded
                 radioPlayout.loadPlayer2Track(currentTrackData);
 
                 // Once the track has been loaded run the rest of the schedule items
-                radioPlayout.runScheduleItems(s.radioPlayout2AudioRef);
+                radioPlayout.runScheduleItems(s.radioPlayer2AudioRef);
             }
             else {
                 // If both of the tracks are locked there has been an error
@@ -439,37 +428,27 @@ const radioPlayout = {
                 // Find the track that has the ID of 'next_track' and get the audio_id
                 let nextTrackId = $(".next_track").data("audio_id");
 
-                if (nextTrackId) {                  
+                if (nextTrackId) {
                     // Load the track meta data
                     radioPlayout.getTrackData(nextTrackId, function (nextTrackData) {
                         // Find a radio player that isn't locked
                         if (!s.radioPlayer1Locked) {
                             // If Radio Player 1 isn't locked
                             // Set the local variable to a reference of Radio Player 1
-                            nextTrackPlayerRef = s.radioPlayout1AudioRef;
+                            nextTrackPlayerRef = s.radioPlayer1AudioRef;
                             // Load the next track onto Radio Player 1 by passing the track data
                             radioPlayout.loadPlayer1Track(nextTrackData);
                             // Set the variable to let the function know that this function has ran
                             nextTrackLoaded = true;
-
-                            s.radioPlayout1ElementSource.connect(s.radioPlayout1Analyser);
-                            s.radioPlayout1Analyser.connect(s.radioPlayout1ScriptProcessor);
-                            s.radioPlayout1ElementSource.connect(s.radioPlayout1AudioContext.destination);
-                            s.radioPlayout1ScriptProcessor.connect(s.radioPlayout1AudioContext.destination);
                         }
                         else if (!s.radioPlayer2Locked) {
                             // If Radio Player 2 isn't locked
                             // Set the local variable to a reference of Radio Player 2
-                            nextTrackPlayerRef = s.radioPlayout2AudioRef;
+                            nextTrackPlayerRef = s.radioPlayer2AudioRef;
                             // Load the next track onto Radio Player 2 by passing the track data
                             radioPlayout.loadPlayer2Track(nextTrackData);
                             // Set the varaible to let the function know that this function has ran
                             nextTrackLoaded = true;
-
-                            s.radioPlayout2ElementSource.connect(s.radioPlayout2Analyser);
-                            s.radioPlayout2Analyser.connect(s.radioPlayout2ScriptProcessor);
-                            s.radioPlayout2ElementSource.connect(s.radioPlayout2AudioContext.destination);
-                            s.radioPlayout2ScriptProcessor.connect(s.radioPlayout2AudioContext.destination);
                         }
                         else {
                             // If both of the players are locked then an error has occured
@@ -477,6 +456,9 @@ const radioPlayout = {
                             console.log("An error occured");
                         }
                     });
+                }
+                else {
+                    // TODO: No audio item found
                 }
             }
 
@@ -510,6 +492,27 @@ const radioPlayout = {
             }
         });
     },
+    getTrackData: function (audioId, callbackFunction) {
+        $.ajax({
+            url: $("#music_catalogue_outer").data("request-url"),
+            type: "POST",
+            data: { "audioId": audioId },
+            success: function (result) {
+                callbackFunction(result[0]);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log("Unable to retrieve track information.");
+                //or you can put jqXHR.responseText somewhere as complete response. Its html.
+            }
+        })
+    },
+    convertSecondsToMinutes: function (durationSeconds) {
+        let minutes = parseInt(durationSeconds / 60);
+        let seconds = parseInt(durationSeconds % 60) < 10 ? "0" + parseInt(durationSeconds % 60).toString() : parseInt(durationSeconds % 60);
+
+        let minutesAndSeconds = minutes.toString() + "." + seconds.toString();
+        return minutesAndSeconds;
+    },
     webcast: function () {
         //WebCaster.js API
         // Initialise an MP3 encoder
@@ -519,21 +522,24 @@ const radioPlayout = {
             bitrate: 128
         });
         // If the Web Audio API sample rate is not equal to 44100, resample the encoder
-        if (audioContext.sampleRate !== 44100) {
+        if (s.radioPlayerAudioContext.sampleRate !== 44100) {
             encoder = new Webcast.Encoder.Resample({
                 encoder: encoder,
-                samplerate: audioContext.sampleRate
+                samplerate: 192000
             });
         }
 
-        let webcast = s.radioPlayout1AudioContext.createWebcastSource(4096, 2);
-
+        // Add a webcast source to the Web Audio API audio context
+        var webcast = s.radioPlayerAudioContext.createWebcastSource(4096, 2);
+        // Add the track to the webcast
+        s.radioPlayer1ElementSource.connect(webcast);
+        s.radioPlayer2ElementSource.connect(webcast);
         // Add the final Web Audio API node to the webcast
-        webcast.connect(audioContext.destination);
+        webcast.connect(s.radioPlayerAudioContext.destination);
         // Connect the webcast to the web socket
-        webcast.connectSocket(encoder, "ws://source:hackme@51.141.107.156:8080/mount");
+        webcast.connectSocket(encoder, "ws://source:hackme@51.141.113.47:8080/mount");
     }
-};
+}
 
 const pressToTalk = {
     settings: {
@@ -550,6 +556,8 @@ const pressToTalk = {
             }
             else {
                 $(this).addClass("mic_live");
+
+                radioPlayout.webcast();
             }
         });
 
@@ -848,33 +856,6 @@ const schedule = {
     }
 };
 
-const autoDJSwitch = {
-    settings: {
-
-    },
-    init: function () {
-        autoDJSwitch.bindUIElements();
-    },
-    bindUIElements: function () {
-        $(".auto_dj_switch").click(function () {
-            if ($(this).hasClass("fa-rotate-180")) {
-                // Auto DJ has been turned on
-                $(this).css("color", "green");
-                $(this).removeClass("fa-rotate-180");
-
-                radioPlayout.autoDJ = true;
-            }
-            else {
-                // Auto DJ has been turned off
-                $(this).css("color", "red");
-                $(this).addClass("fa-rotate-180");
-
-                radioPlayout.autoDJ = false;
-            }
-        });
-    }
-};
-
 $(document).ready(function () {
     $.event.addProp('dataTransfer');
 
@@ -882,5 +863,4 @@ $(document).ready(function () {
     pressToTalk.init();
     schedule.init();
     musicLibrary.init();
-    autoDJSwitch.init();
 });
