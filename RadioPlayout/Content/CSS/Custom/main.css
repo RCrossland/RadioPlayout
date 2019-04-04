@@ -226,19 +226,31 @@
 		transform: rotate(-90deg);
 	}
 
-.push_to_talk_button {
+.press_to_talk_button {
 	padding-top: 2em;
 	padding-bottom: 2em;
 	padding-left: 1em;
 	padding-right: 1em;
-	border: 0.2em solid black;
+	border: 0.2em solid red;
 	border-radius: 50%;
 }
 
-	.push_to_talk_button:hover {
-		background-color: #343a40;
+	.press_to_talk_button:hover {
+		background-color: red;
 		color: #ffffff;
 	}
+
+.mic_live {
+	animation-name: mic_live_animation;
+	animation-duration: 1s;
+	animation-iteration-count: infinite;
+}
+
+@keyframes mic_live_animation{
+	from {background-color: red; color: white}
+	to {
+		background-color: white; color: #212529}
+}
 
 .schedule_content_outer {
 	height: 26em;

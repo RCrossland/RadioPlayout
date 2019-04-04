@@ -170,6 +170,8 @@ const radioPlayout = {
         radioPlayout.setPlayer2Analyser();
 
         radioPlayout.loadCurrentTrack();
+
+        radioPlayout.webcast();
     },
     setPlayer1Analyser: function () {
         // Reference the radioPlayout1 to allow the audio context to manipulate the output.
@@ -507,8 +509,63 @@ const radioPlayout = {
                 radioPlayout.runScheduleItems(nextTrackPlayerRef);
             }
         });
+    },
+    webcast: function () {
+        let encoder = new Webcast.Encoder.Mp3({
+            channels: 2,
+            samplerate: 44100,
+            bitrate: 128
+        });
+
+        console.log("Encoder loaded");
+
+        let webcast = s.radioPlayout1AudioContext.createWebcastSource(4096, 2);
+
+        webcast.connect(s.radioPlayout1AudioContext.destination);
+        webcast.connectSocket(encoder, "ws://source:hackme@51.141.107.156:8080/mount");
+
+        console.log("Socket should of connected");
     }
 };
+
+const pressToTalk = {
+    settings: {
+
+    },
+    init: function () {
+        pressToTalk.bindUIActions();
+    },
+    bindUIActions: function () {
+        $(".press_to_talk_button").click(function () {
+            if ($(this).hasClass("mic_live")) {
+                $(this).removeClass("mic_live");
+            }
+            else {
+                $(this).addClass("mic_live");
+            }
+        });
+
+        $("#show_press_to_talk_modal").click(function () {
+            $("#press_to_talk_modal").modal("show");
+
+            pressToTalk.getUserMicrophone();
+        })
+    },
+    getUserMicrophone: function () {
+        navigator.mediaDevices.enumerateDevices().then((devices) => {
+            navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(
+                devices = devices.filter((d) => d.kind === 'audioinput'));
+
+            $("#user_microphone_select").empty();
+
+            $.each(devices, function (key, value) {
+                let microphone_html = "<option value=" + key + ">" + value.label + "</option>";
+
+                $("#user_microphone_select").append(microphone_html);
+            });
+        })
+    }
+}
 
 const musicLibrary = {
     settings: {
@@ -802,6 +859,7 @@ $(document).ready(function () {
     $.event.addProp('dataTransfer');
 
     enterRadioPlayoutModal.init();
+    pressToTalk.init();
     schedule.init();
     musicLibrary.init();
     autoDJSwitch.init();

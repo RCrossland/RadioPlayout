@@ -241,6 +241,7 @@
     <Content Include="Views\Account\_FilterManageAccounts.cshtml" />
     <Content Include="Views\Account\_AddUser.cshtml" />
     <Content Include="Views\Account\_EditUser.cshtml" />
+    <Content Include="Views\RadioPlayer\_PressToTalkModal.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
