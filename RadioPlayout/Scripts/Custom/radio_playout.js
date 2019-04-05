@@ -155,10 +155,13 @@ const radioPlayout = {
 
         // Initialise an Audio Context node
         s.radioPlayerAudioContext = new AudioContext();
+
+        // Add a webcast source to the Web Audio API audio context
+        s.radioPlayerWebCast = s.radioPlayerAudioContext.createWebcastSource(4096, 2);
     },
     createRadioPlayer1AudioNode: function () {
         // Initialise a new Audio object
-        s.radioPlayer1AudioRef = new Audio("/Content/Audio/01SoAmI.mp3");
+        s.radioPlayer1AudioRef = $("#radio_player_1_audio")[0];
         // Set the default value of the audio to 90%
         s.radioPlayer1AudioRef.volume = 0.95;
 
@@ -171,7 +174,7 @@ const radioPlayout = {
     },
     createRadioPlayer2AudioNode: function () {
         // Initialise a new Audio object
-        s.radioPlayer2AudioRef = new Audio("/Content/Audio/02NoOne.mp3");
+        s.radioPlayer2AudioRef = $("#radio_player_2_audio")[0];
         // Set the default value of the audio to 90%
         s.radioPlayer2AudioRef.volume = 0.95;
 
@@ -283,12 +286,10 @@ const radioPlayout = {
         radioPlayer2Analyser.connect(radioPlayout2ScriptProcessor);
     },
     loadPlayer1Track: function (trackData) {
-        // Set the audio track source
-        s.radioPlayer1AudioRef.setAttribute('src', "Content/Audio/" + trackData.AudioLocation);
-
         // When the track has loaded
-        s.radioPlayer1AudioRef.onloadeddata = function () {
+        $(s.radioPlayer1AudioRef).on("loadeddata", function () {
             s.radioPlayer1Locked = true;
+
             s.radioPlayer1AudioRef.volume = 0.75;
             s.radioPlayer1SongDuration = s.radioPlayer1AudioRef.duration;
             $("#radio_player_1_artist_name").text(trackData.ArtistName);
@@ -317,14 +318,14 @@ const radioPlayout = {
                 $("#radio_player_1_duration_bar").children(".progress-bar").css({ "width": (s.radioPlayer1AudioRef.currentTime / s.radioPlayer1SongDuration) * 100 + "%" });
                 $("#radio_player_1_duration_bar").children(".progress-bar").text(radioPlayout.convertSecondsToMinutes(s.radioPlayer1AudioRef.currentTime));
             });
-        };
+        });
+
+        // Set the audio track source
+        s.radioPlayer1AudioRef.setAttribute('src', "Content/Audio/" + trackData.AudioLocation);
     },
     loadPlayer2Track: function (trackData) {
-        // Set the audio track source
-        s.radioPlayer2AudioRef.setAttribute('src', "Content/Audio/" + trackData.AudioLocation);
-
         // When the track has loaded
-        s.radioPlayer2AudioRef.onloadeddata = function () {
+        $(s.radioPlayer2AudioRef).on("loadeddata", function () {
             s.radioPlayer2Locked = true;
             s.radioPlayer2AudioRef.volume = 0.75;
             s.radioPlayer2SongDuration = s.radioPlayer2AudioRef.duration;
@@ -354,7 +355,10 @@ const radioPlayout = {
                 $("#radio_player_2_duration_bar").children(".progress-bar").css({ "width": (s.radioPlayer2AudioRef.currentTime / s.radioPlayer2SongDuration) * 100 + "%" });
                 $("#radio_player_2_duration_bar").children(".progress-bar").text(radioPlayout.convertSecondsToMinutes(s.radioPlayer2AudioRef.currentTime));
             });
-        };
+        });
+
+        // Set the audio track source
+        s.radioPlayer2AudioRef.setAttribute('src', "Content/Audio/" + trackData.AudioLocation);
     },
     clearRadioPlayer1: function () {
         // Remove the attributes from Radio Player 1
@@ -546,15 +550,13 @@ const radioPlayout = {
             });
         }
 
-        // Add a webcast source to the Web Audio API audio context
-        s.radioPlayerWebCast = s.radioPlayerAudioContext.createWebcastSource(4096, 2);
         // Add the track to the webcast
         s.radioPlayer1ElementSource.connect(s.radioPlayerWebCast);
         s.radioPlayer2ElementSource.connect(s.radioPlayerWebCast);
         // Add the final Web Audio API node to the webcast
         s.radioPlayerWebCast.connect(s.radioPlayerAudioContext.destination);
         // Connect the webcast to the web socket
-        s.radioPlayerWebCast.connectSocket(encoder, "ws://source:hackme@51.141.104.113:8080/mount");
+        s.radioPlayerWebCast.connectSocket(encoder, "ws://source:hackme@51.141.107.158:8080/mount");
     },
 }
 
@@ -621,8 +623,10 @@ const pressToTalk = {
             microphoneStream.connect(radioPlayout.settings.radioPlayerWebCast);
 
             $(".press_to_talk_button").click(function () {
-                    microphoneStream.disconnect(radioPlayout.settings.radioPlayerAudioContext.destination);
-                    microphoneStream.disconnect(radioPlayout.settings.radioPlayerWebCast);
+                microphoneStream.disconnect(radioPlayout.settings.radioPlayerAudioContext.destination);
+                microphoneStream.disconnect(radioPlayout.settings.radioPlayerWebCast);
+                $(".press_to_talk_button").off("click");
+                pressToTalk.bindUIActions();
             });
         });
     }
