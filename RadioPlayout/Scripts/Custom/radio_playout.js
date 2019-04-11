@@ -546,7 +546,7 @@ const radioPlayout = {
         if (s.radioPlayerAudioContext.sampleRate !== 44100) {
             encoder = new Webcast.Encoder.Resample({
                 encoder: encoder,
-                samplerate: 192000
+                samplerate: s.radioPlayerAudioContext.sampleRate
             });
         }
 
@@ -556,7 +556,7 @@ const radioPlayout = {
         // Add the final Web Audio API node to the webcast
         s.radioPlayerWebCast.connect(s.radioPlayerAudioContext.destination);
         // Connect the webcast to the web socket
-        s.radioPlayerWebCast.connectSocket(encoder, "ws://source:hackme@51.141.107.158:8080/mount");
+        s.radioPlayerWebCast.connectSocket(encoder, "ws://source:hackme@51.141.108.253:8080/mount");
     },
 }
 
