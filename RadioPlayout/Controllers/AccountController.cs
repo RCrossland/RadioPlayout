@@ -551,7 +551,7 @@ namespace RadioPlayout.Controllers
 		public ActionResult LogOff()
 		{
 			AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-			return RedirectToAction("Index", "Home");
+			return RedirectToAction("Login", "Account");
 		}
 
 		//
@@ -582,50 +582,6 @@ namespace RadioPlayout.Controllers
 			base.Dispose(disposing);
 		}
 
-		//
-		// GET: /Account/Register
-		[AllowAnonymous]
-		public ActionResult Register()
-		{
-			return View();
-		}
-
-		//
-		// POST: /Account/Register
-		[HttpPost]
-		[AllowAnonymous]
-		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> Register(RegisterViewModel model)
-		{
-			if (ModelState.IsValid)
-			{
-				var user = new ApplicationUser
-				{
-					UserName = model.Email,
-					Email = model.Email,
-					FirstName = model.FirstName,
-					LastName = model.LastName
-				};
-				var result = await UserManager.CreateAsync(user, model.Password);
-				if (result.Succeeded)
-				{
-					await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-
-					// For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-					// Send an email with this link
-					// string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-					// var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-					// await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
-
-					return RedirectToAction("Index", "Home");
-				}
-				AddErrors(result);
-			}
-
-			// If we got this far, something failed, redisplay form
-			return View(model);
-		}
-
 		#region Helpers
 		// Used for XSRF protection when adding external logins
 		private const string XsrfKey = "XsrfId";
@@ -652,7 +608,7 @@ namespace RadioPlayout.Controllers
 			{
 				return Redirect(returnUrl);
 			}
-			return RedirectToAction("Index", "Home");
+			return RedirectToAction("ManageUsers", "Account");
 		}
 
 		internal class ChallengeResult : HttpUnauthorizedResult

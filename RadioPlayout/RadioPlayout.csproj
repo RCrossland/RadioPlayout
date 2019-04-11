@@ -177,7 +177,6 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AudioController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\RadioPlayerController.cs" />
     <Compile Include="Controllers\ScheduleController.cs" />
@@ -212,7 +211,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\Custom\audio_items.js" />
-    <Content Include="Scripts\Custom\dashboard.js" />
     <Content Include="Scripts\Custom\global.js" />
     <Content Include="Scripts\Custom\manage_user.js" />
     <Content Include="Scripts\Custom\radio_playout.js" />
@@ -231,7 +229,6 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\RadioPlayer\index.cshtml" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Content Include="Views\Shared\_AuthLayout.cshtml" />
