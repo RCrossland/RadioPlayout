@@ -1,0 +1,71 @@
+﻿@model RadioPlayout.Models.AudioFormViewModel
+
+@Html.AntiForgeryToken()
+@Html.TextBoxFor(m => m.AudioId, new { @class = "d-none audio_id_ref" })
+<div class="form-row">
+	<div class="col-6">
+		<div class="form-group">
+			<div class="input-group">
+				@Html.TextBoxFor(m => m.ArtistName, new { placeholder = "Aritst Name", @class = "form-control artist_name_ref" })
+			</div>
+		</div>
+	</div>
+	<div class="col-6">
+		<div class="form-group">
+			<div class="input-group">
+				@Html.TextBoxFor(m => m.AudioTitle, new { placeholder = "Audio Title", @class = "form-control audio_title_ref" })
+			</div>
+		</div>
+	</div>
+</div>
+<div class="form-row">
+	<div class="col-6">
+		@Html.LabelFor(m => m.AudioType)
+		<div class="form-group">
+			@Html.DropDownListFor(m => m.AudioType, ViewBag.AudioTypeList as IEnumerable<SelectListItem>, "", new { @class = "form-control audio_type_select" })
+		</div>
+	</div>
+	<div class="col-6">
+		@Html.LabelFor(m => m.AudioReleaseYear)
+		<div class="form-group">
+			@Html.TextBoxFor(m => m.AudioReleaseYear, new { Value = "", @class = "form-control audio_release_year_ref" })
+		</div>
+	</div>
+</div>
+<div class="form-row">
+	<div class="col-6 col-lg-4 audio_file_outer" data-upload-audio="@Url.Action("UploadAudioFile", "Audio")">
+		@Html.LabelFor(m => m.AudioLocation)
+		@Html.TextBox("NotNeeded", "NotNeeded", new { type = "file", @class = "form-control audio_file" })
+		@Html.TextBoxFor(m => m.AudioLocation, new { @class = "form-control d-none audio_file_location" })
+	</div>
+	<div class="col-6 d-lg-none">
+		@Html.LabelFor(m => m.AudioDuration)
+		@Html.TextBoxFor(m => m.AudioDuration, new { Value = "00:00:00", @class = "form-control audio_duration", @readonly = "readonly" })
+	</div>
+	<div class="col-12 col-lg-8">
+		<div class="form-row">
+			<div class="col-6 col-lg-4">
+				@Html.LabelFor(m => m.AudioIn)
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<div class="input-group-text audio_in_check"><i class="fas fa-angle-double-left"></i></div>
+					</div>
+					@Html.TextBoxFor(m => m.AudioIn, new { Value = "00:00", @class = "form-control audio_in_value" })
+				</div>
+			</div>
+			<div class="col-6 col-lg-4">
+				@Html.LabelFor(m => m.AudioOut)
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<div class="input-group-text audio_out_check"><i class="fas fa-angle-double-right"></i></div>
+					</div>
+					@Html.TextBoxFor(m => m.AudioOut, new { Value = "00:00", @class = "form-control audio_out_value" })
+				</div>
+			</div>
+			<div class="col-4 d-none d-lg-block">
+				@Html.LabelFor(m => m.AudioDuration)
+				@Html.TextBoxFor(m => m.AudioDuration, new { Value = "00:00:00", @class = "form-control audio_duration", @readonly = "readonly" })
+			</div>
+		</div>
+	</div>
+</div>

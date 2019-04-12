@@ -2,37 +2,33 @@
 
 let editAudioItems = {
     settings: {
-        // Audio modal type
-        audioModalType: null,
-
         // WaveSurfer to display the audio waveform
-        wavesurfer: null,
+        addWaveSurfer: null,
+        editWaveSurfer: null,
 
-        // Modal settings
-        audioModalTitle: null,
-        audioModalButton: null,
+        // Audio Modal references
+        currentModalType: null,
+        addAudioModal: null,
+        editAudioModal: null,
 
         // Audio form references
         audioItemForm: null,
 
+        // Audio field references
         artistNameRef: null,
         audioTitleRef: null,
         audioTypeRef: null,
         audioReleaseYearRef: null,
+        audioInCheck: null,
         audioInRef: null,
+        audioOutCheck: null,
         audioOutRef: null,
-        audioDurationRef: null,
-        audioFileRef: null,
+        audioDuration: null,
+        audioFile: null,
+        audioFileLocation: null,
 
-        // Audio form error references
-        audioModalError: null,
-        artistNameErrorRef: null,
-        audioTitleErrorRef: null,
-        audioTypeErrorRef: null,
-        audioReleaseYearErrorRef: null,
-        audioInErrorRef: null,
-        audioOutErrorRef: null,
-        audioDurationErrorRef: null
+        audioSuccess: null,
+        audioErrorList: null
     },
     init: function () {
         s = editAudioItems.settings;
@@ -40,77 +36,67 @@ let editAudioItems = {
         editAudioItems.bindUIElements();
 
         // Create a WaveSurfer object and set it's reference to the 'waveform' div
-        editAudioItems.settings.wavesurfer = WaveSurfer.create({
-            container: '#waveform'
+        editAudioItems.settings.editWaveSurfer = WaveSurfer.create({
+            container: '#edit_waveform'
+        });
+
+        editAudioItems.settings.addWaveSurfer = WaveSurfer.create({
+            container: '#add_waveform'
         });
     },
     bindUIElements: function () {
-        // Set a reference to the HTML elements
-        s.audioModalTitle = $("#audio_modal_title");
-        s.audioModalButton = $("#audio_modal_button");
+        // Modal references
+        s.addAudioModal = $("#add_audio_items_modal");
+        s.editAudioModal = $("#edit_audio_items_modal");
 
+        // Form references
         s.audioItemForm = $("#audio_item_form");
 
-        s.artistNameRef = $("#artist_name");
-        s.audioTitleRef = $("#audio_title");
-        s.audioTypeRef = $("#audio_type");
-        s.audioReleaseYearRef = $("#audio_release_year");
-        s.audioInRef = $("#audio_in");
-        s.audioOutRef = $("#audio_out");
-        s.audioDurationRef = $(".audio_duration");
-        s.audioFileRef = $("#audio_file_upload");
+        // Global fields
+        s.artistNameRef = $(".artist_name_ref");
+        s.audioTitleRef = $(".audio_title_ref");
+        s.audioTypeRef = $(".audio_type_select");
+        s.audioReleaseYearRef = $(".audio_release_year_ref");
+        s.audioInCheck = $(".audio_in_check");
+        s.audioInRef = $(".audio_in_value");
+        s.audioOutCheck = $(".audio_out_check");
+        s.audioOutRef = $(".audio_out_value");
+        s.audioDuration = $(".audio_duration");
+        s.audioFile = $(".audio_file");
+        s.audioFileLocation = $(".audio_file_location");
 
-        s.audioModalError = $("#audio_modal_error");
-        s.artistNameErrorRef = $("#artist_name_error");
-        s.audioTitleErrorRef = $("#audio_title_error");
-        s.audioTypeErrorRef = $("#audio_type_error");
-        s.audioReleaseYearErrorRef = $("#audio_release_year_error");
-        s.audioInErrorRef = $("#audio_in_error");
-        s.audioOutErrorRef = $("#audio_out_error");
-        s.audioDurationErrorRef = $("#audio_duration_error");
+        // Add new audio item element references
+        s.audioItemForm = $("#audio_item_modal");
+        s.audioSuccess = $("#audio_modal_success");
+        s.audioErrorList = $("#audio_modal_error");
 
+        // Event handlers
         $("#add_audio_button").click(function () {
+            s.currentModalType = "add";
+
             // Show the audio items modal
-            $("#audio_items_modal").modal('show');
+            $("#add_audio_items_modal").modal('show');
 
             // reset the Audio Item form
             s.audioItemForm.trigger("reset");
 
             // reset form messages
-            $("#audio_modal_success").empty();
-            $("#audio_modal_error").empty();
+            s.audioSuccess.empty();
+            s.audioErrorList.empty();
 
             // reset the track duration
-            $(".audio_duration").attr("value", "00:00:00");
-
-            // Reset the form error messages
-            $(".audio_error").val("test");
-
-            // Set the audioModalType to reference adding a new audio type
-            s.audioModalType = "addAudioItem";
-
-            // Set the audio item title
-            s.audioModalTitle.text("Add New Audio Item");
-
-            // Set the audio item button
-            s.audioModalButton.val("Add Audio Item");
+            s.audioFileLocation.val("");
+            s.audioDuration.val("00:00:00");
         });
 
         $(".edit_audio_item").on("click", function () {
+            s.currentModalType = "edit";
+
             // Show the audio items modal
-            $("#audio_items_modal").modal('show');
+            $("#edit_audio_items_modal").modal('show');
 
             // reset the Audio Item form
             s.audioItemForm.trigger("reset");
-
-            // Set the audioModalType to reference adding a new audio type
-            s.audioModalType = "editAudioItem";
-
-            // Set the audio item title
-            s.audioModalTitle.text("Edit Audio Item");
-
-            // Set the audio item button
-            s.audioModalButton.val("Edit Audio Item");
 
             editAudioItems.getAudioItemInfo($(this).data("audio-id"), $(this).data("get-audio"));
         });
@@ -119,17 +105,24 @@ let editAudioItems = {
             editAudioItems.deleteAudioItem($(this).data("audio-id"));
         });
 
-        $("#audio_modal_pause").click(function () {
-            editAudioItems.settings.wavesurfer.pause();
+        $("#add_audio_modal_play").click(function () {
+            editAudioItems.settings.addWaveSurfer.play();
         });
 
-        $("#audio_modal_play").click(function () {
-            editAudioItems.settings.wavesurfer.play();
+        $("#add_audio_modal_pause").click(function () {
+            editAudioItems.settings.addWaveSurfer.pause();
+        });
+
+        $("#edit_audio_modal_play").click(function () {
+            editAudioItems.settings.editWaveSurfer.play();
+        });
+
+        $("#edit_audio_modal_pause").click(function () {
+            editAudioItems.settings.editWaveSurfer.pause();
         });
 
         $("#audio_item_form").on('submit', function (e) {
             e.preventDefault();
-
             // TODO: Change this back to validate the audio form
             if (editAudioItems.validateAudioForm(s.audioModalType)) {
                 // Form is valid and can submit
@@ -142,91 +135,132 @@ let editAudioItems = {
             }
         });
 
-        $("#audio_file_upload").on('change', function () {
+        s.audioFile.on('change', function () {
             // Create a FormData object in order to store the file data
             let formData = new FormData();
-            // Get the file data fromt he form
-            let files = s.audioFileRef[0].files;
+            // Get the file data from the input field
+            let files = $(this)[0].files;
             // Add the file to the form data
             formData.append("audioFile", files[0]);
 
             // Send the FormData to the AudioController and wait for a response
             let xhr = new XMLHttpRequest();
-            xhr.open('POST', s.audioFileRef.data("upload-url"));
+            xhr.open('POST', $(".audio_file_outer").data("upload-audio"));
             xhr.send(formData);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     // Call the loadWaveFrom function passing in the file path without the quotes
                     // Match one or more ["] double quotes and apply to the entire string an empty ''
-                    editAudioItems.loadWaveForm(xhr.responseText.replace(/["]+/g, ''));
+                    if (s.currentModalType == "add") {
+                        editAudioItems.loadWaveForm("add", s.addWaveSurfer, xhr.responseText.replace(/["]+/g, ''));
+                    }
+                    else {
+                        editAudioItems.loadWaveForm("edit", s.editWaveSurfer, xhr.responseText.replace(/["]+/g, ''));
+                    }
+
+                    s.audioFileLocation.val(xhr.responseText.split("/").pop());
                 }
                 else if (xhr.status == 404) {
                     // If we get a 404 error here. It is usually because the file being uploaded it to big
-                    $("#audio_modal_error").empty().append("The file uploaded is to big. Please try again.");
+                    s.audioErrorList.empty().append("<li>The file uploaded is to big. Please try again.</li>");
                 }
             }
 
         });
     },
-    loadWaveForm: function (filePath) {
+    loadWaveForm: function (type, wavesurfer, filePath) {
         // Load the audio file into WaveSurfer
-        editAudioItems.settings.wavesurfer.load(filePath);
+        wavesurfer.load(filePath);
 
         // When the audio track has laoded into WaveSurfer
-        editAudioItems.settings.wavesurfer.on('ready', function () {
+        wavesurfer.on('ready', function () {
             // Get the duration and display it to the user
             let date = new Date(null);
-            date.setSeconds(editAudioItems.settings.wavesurfer.getDuration());
-            $(".audio_duration").attr("value", date.toISOString().substr(11, 8));
+            date.setSeconds(wavesurfer.getDuration());
+            s.audioDuration.val(date.toISOString().substr(11, 8));
 
             let audioInCheck = false;
             // Set a click event handler on both of the AudioIn and AudioOut input boxes
-            $("#audio_in_check").click(function () {
+            s.audioInCheck.click(function () {
                 if (!audioInCheck) {
                     audioInCheck = true;
                     $(this).css("border", "1px solid red");
 
-                    editAudioItems.settings.wavesurfer.on("seek", editAudioItems.setAudioIn);
+                    if (type == "add") {
+                        wavesurfer.on("seek", editAudioItems.setAddAudioIn);
+                    }
+                    else {
+                        wavesurfer.on("seek", editAudioItems.setEditAudioIn);
+                    }
                 }
                 else {
                     audioInCheck = false;
                     $(this).css("border", "");
 
-                    editAudioItems.settings.wavesurfer.un("seek", editAudioItems.setAudioIn);
+                    if (type == "add") {
+                        wavesurfer.un("seek", editAudioItems.setAddAudioIn);
+                    }
+                    else {
+                        wavesurfer.un("seek", editAudioItems.setEditAudioIn);
+                    }
                 }
             });
 
             let audioOutCheck = false;
             // Set a click event handler on both of the AudioOut and AudioOut input boxes
-            $("#audio_out_check").click(function () {
+            s.audioOutCheck.click(function () {
                 if (!audioOutCheck) {
                     audioOutCheck = true;
                     $(this).css("border", "1px solid red");
 
-                    editAudioItems.settings.wavesurfer.on("seek", editAudioItems.setAudioOut);
+                    if (type == "add") {
+                        wavesurfer.on("seek", editAudioItems.setAddAudioOut);
+                    }
+                    else {
+                        wavesurfer.on("seek", editAudioItems.setEditAudioOut);
+                    }
                 }
                 else {
                     audioOutCheck = false;
                     $(this).css("border", "");
 
-                    editAudioItems.settings.wavesurfer.un("seek", editAudioItems.setAudioOut);
+                    if (type == "add") {
+                        wavesurfer.un("seek", editAudioItems.setAddAudioOut);
+                    }
+                    else {
+                        wavesurfer.un("seek", editAudioItems.setEditAudioOut);
+                    }
                 }
             });
         });
     },
-    setAudioIn: function () {
+    setAddAudioIn: function () {
         // Get the duration and display it to the user
         let date = new Date(null);
-        date.setSeconds(editAudioItems.settings.wavesurfer.getCurrentTime());
+        date.setSeconds(editAudioItems.settings.addWaveSurfer.getCurrentTime());
 
-        $("#audio_in").attr("value", date.toISOString().substr(11, 8));
+        s.audioInRef.val(date.toISOString().substr(11, 8));
     },
-    setAudioOut: function () {
+    setEditAudioIn: function () {
         // Get the duration and display it to the user
         let date = new Date(null);
-        date.setSeconds(editAudioItems.settings.wavesurfer.getCurrentTime());
+        date.setSeconds(editAudioItems.settings.editWaveSurfer.getCurrentTime());
 
-        $("#audio_out").attr("value", date.toISOString().substr(11, 8));
+        s.audioInRef.val(date.toISOString().substr(11, 8));
+    },
+    setAddAudioOut: function () {
+        // Get the duration and display it to the user
+        let date = new Date(null);
+        date.setSeconds(editAudioItems.settings.addWaveSurfer.getCurrentTime());
+
+        s.audioOutRef.val(date.toISOString().substr(11, 8));
+    },
+    setEditAudioOut: function () {
+        // Get the duration and display it to the user
+        let date = new Date(null);
+        date.setSeconds(editAudioItems.settings.editWaveSurfer.getCurrentTime());
+
+        s.audioOutRef.val(date.toISOString().substr(11, 8));
     },
     validateAudioForm: function () {
         if (editAudioItems.validateArtistName() && editAudioItems.validateAudioTitle() &&
@@ -311,96 +345,6 @@ let editAudioItems = {
     },
     stripInput: function (input) {
         // Strip the user input of any harmful inputs
-    },
-    validateArtistName: function() {
-        if (s.artistNameRef.val() == "") {
-            // User hasn't entered an artist name
-            s.artistNameErrorRef.text("Please enter an artist name.");
-            return false;
-        }
-        else {
-            // User has entered an artist name
-            s.artistNameErrorRef.text("");
-            return true;
-        }
-    },
-    validateAudioTitle: function () {
-        if (s.audioTitleRef.val() == "") {
-            // User hasn't entered an artist name
-            s.audioTitleErrorRef.text("Please enter an audio title.");
-            return false;
-        }
-        else {
-            // User has entered an artist name
-            s.audioTitleErrorRef.text("");
-            return true;
-        }
-    },
-    validateAudioType: function () {
-        if (s.audioTypeRef.val() == null){
-            // User hasn't selected an audio type reference
-            s.audioTypeErrorRef.text("Please select an audio type");
-            return false;
-        }
-        else {
-            // User has selected an audio type reference
-            s.audioTypeErrorRef.text("");
-            return true;
-        }
-    },
-    validateReleaseYears: function () {
-        if (s.audioReleaseYearRef.val() == null) {
-            // User hasn't selected an audio release year
-            s.audioReleaseYearErrorRef.text("Please select an audio release year");
-            return false;
-        }
-        else {
-            // User has selected an audio release year
-            s.audioReleaseYearErrorRef.text("");
-            return true;
-        }
-    },
-    validateAudioLocation: function (audioModalType) {
-        if (s.audioFileRef[0].files.length <= 0 && audioModalType == "addAudioItem") {
-            // User has added any audio files
-            s.audioModalError.text("Please upload an audio file");
-            return false;
-        }
-        else {
-            // User has uploaded an audio file
-            s.audioModalError.text("");
-            return true;
-        }
-    },
-    validateAudioIn: function () {
-        if (editAudioItems.getSeconds(s.audioInRef.val()) == -1) {
-            s.audioInErrorRef.text("There was an error.");
-            return false;
-        }
-        else {
-            s.audioInErrorRef.text("");
-            return true;
-        }
-    },
-    validateAudioOut: function () {
-        if (editAudioItems.getSeconds(s.audioOutRef.val()) == -1) {
-            s.audioOutErrorRef.text("There wasn an error.");
-            return false;
-        }
-        else {
-            s.audioOutErrorRef.text("");
-            return true;
-        }
-    },
-    validateAudioDuration: function () {
-        if (editAudioItems.getSeconds(s.audioDurationRef.val()) == -1) {
-            s.audioDurationErrorRef.text("There was an error.");
-            return false;
-        }
-        else {
-            s.audioDurationErrorRef.text("");
-            return true;
-        }
     },
     displayValidation: function (ajaxResponse) {
         if (ajaxResponse.hasOwnProperty("ArtistName")) {
@@ -510,13 +454,14 @@ let editAudioItems = {
                 let audioItem = data[0];
 
                 // Set the audio form values
+                $(".audio_id_ref").val(audioItem.AudioId);
                 s.artistNameRef.val(audioItem.ArtistName);
                 s.audioTitleRef.val(audioItem.AudioTitle);
                 s.audioTypeRef.val(audioItem.AudioType.AudioTypeId)
                 s.audioReleaseYearRef.val(audioItem.AudioReleaseYear);
 
-                $("#audio_item_form").attr("data-audio-id", audioItem.AudioId);
-                $("#audio_file_upload").attr("data-file-name", audioItem.AudioLocation); // Split the file path just to get the filename
+                s.audioItemForm.attr("data-audio-id", audioItem.AudioId);
+                s.audioFileLocation.val(audioItem.AudioLocation); // Split the file path just to get the filename
 
                 let date = new Date(null);
                 date.setSeconds(audioItem.AudioIn);
@@ -525,7 +470,7 @@ let editAudioItems = {
                 date.setSeconds(audioItem.AudioOut);
                 s.audioOutRef.val(date.toISOString().substr(11, 8));
 
-                editAudioItems.loadWaveForm("Content/Audio/" + audioItem.AudioLocation);
+                editAudioItems.loadWaveForm("edit", s.editWaveSurfer, "Content/Audio/" + audioItem.AudioLocation);
             },
             error: function (jqXHR, textStatus, errorThrown) {
             }

@@ -10,6 +10,7 @@ using System.IO;
 using System.Web.Hosting;
 using Microsoft.AspNet.Identity;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace RadioPlayout.Controllers
 {
@@ -137,120 +138,19 @@ namespace RadioPlayout.Controllers
 
 			ViewBag.AudioCount = audio.Count();
 
+			// Set Audio Type viewbag
+			IEnumerable<SelectListItem> audioTypeList = _db.AudioType.Select(at => new SelectListItem
+			{
+				Value = at.AudioTypeId.ToString(),
+				Text = at.AudioTypeName
+			});
+
+			ViewBag.AudioTypeList = audioTypeList;
+
 			int pageSize = 10;
 			int pageNumber = (page ?? 1);
             return View(audio.ToPagedList(pageNumber, pageSize));
         }
-
-		/// <summary>
-		/// Validate the different Audio Items and add the errors to the global Error dictionary.
-		/// </summary>
-		/// <param name="artistName">The Artist Name to validate.</param>
-		/// <param name="audioTitle">The Audio Title to validate.</param>
-		/// <param name="audioLocation">The Audio Location to validate.</param>
-		/// <param name="uploadPath">The directory where the audio files are uploaded.</param>
-		/// <param name="audioPath">The directory where the validate audio files are kept.</param>
-		/// <param name="audioDuration">The Audio Duration to validate.</param>
-		/// <param name="audioIn">The Audio In to validate.</param>
-		/// <param name="audioOut">The Audio Out to validate.</param>
-		/// <param name="audioReleaseYear">The Audio Release Year to validate.</param>
-		/// <param name="audioType">The Audio Type to validate.</param>
-		public void ValidateAudioItems(string artistName, string audioTitle, string audioLocation, string uploadPath, string audioPath, 
-			string audioDuration, string audioIn, string audioOut, string audioReleaseYear, string audioType)
-		{
-			// Reference to an invlid integer value
-			int integerReference;
-
-			// Validate the inputted values
-			// Validate the artist name
-			if (String.IsNullOrWhiteSpace(artistName))
-			{
-				// Artist name doesn't have a value
-				errorDict.Add("ArtistName", "The artist name cannot be empty.");
-			}
-
-			// Validate the audio title
-			if (string.IsNullOrWhiteSpace(audioTitle))
-			{
-				// Audio title doesn't have a value
-				errorDict.Add("AudioTitle", "The audio title cannot be empty.");
-			}
-
-			// Validate the audio location
-			if (String.IsNullOrWhiteSpace(audioLocation))
-			{
-				// Audio location doesn't have a value
-				errorDict.Add("AudioLocation", "The audio location cannot be empty.");
-			}
-			else if (!System.IO.File.Exists(uploadPath))
-			{
-				if (!System.IO.File.Exists(audioPath))
-				{
-					// Audio is not in the /Content/Audio/Upload
-					errorDict.Add("AudioLocation", "The audio file has not been uploaded, please try again");
-				}
-			}
-
-			// Validate the audio duration
-				if (String.IsNullOrWhiteSpace(audioDuration))
-			{
-				// Audio duration doesn't have a value
-				errorDict.Add("AudioDuration", "The audio duration cannot be empty.");
-			}
-			else if (!Int32.TryParse(audioDuration, out integerReference))
-			{
-				// Audio Duration couldn't be converted to an integer
-				errorDict.Add("AudioDuration", "The audio duration couldn't be converted to an integer");
-			}
-
-			// Validate the audio in
-			if (String.IsNullOrWhiteSpace(audioIn))
-			{
-				// Audio in doesn't have a value
-				errorDict.Add("AudioIn", "The audio in cannot be empty");
-			}
-			else if (!Int32.TryParse(audioIn, out integerReference))
-			{
-				// Audio in couldn't be converted to an integer
-				errorDict.Add("AudioIn", "The audio in couldn't be converted to an integer");
-			}
-
-			// Vaidate the audio out
-			if (String.IsNullOrWhiteSpace(audioOut))
-			{
-				// Audio out doesn't have a value
-				errorDict.Add("AudioOut", "The audio out cannot be empty.");
-			}
-			else if (!Int32.TryParse(audioOut, out integerReference))
-			{
-				// Audio out couldn't be converted to an integer
-				errorDict.Add("AudioOut", "The audio out couldn't be converted to an integer.");
-			}
-
-			// Validate the release year
-			if (String.IsNullOrWhiteSpace(audioReleaseYear))
-			{
-				// Audio release year doesn't have a value
-				errorDict.Add("AudioReleaseYear", "The audio release year cannot be empty");
-			}
-			else if (!Int32.TryParse(audioReleaseYear, out integerReference))
-			{
-				// Audio release year couldn't be converted to an integer
-				errorDict.Add("AudioReleaseYear", "The audio release year couldn't be converted to an integer.");
-			}
-
-			// Validate the audio type
-			if (String.IsNullOrWhiteSpace(audioType))
-			{
-				// Audio type doesn't have a value
-				errorDict.Add("AudioType", "THe audio type cannot be empty.");
-			}
-			else if (!Int32.TryParse(audioType, out integerReference))
-			{
-				// Audio type couldn't be converted to an integer
-				errorDict.Add("AudioType", "The audio type couldn't be converted to an integer");
-			}
-		}
 
 		/// <summary>
 		/// Add a new Audio Item to the Audio DB. The items will each be validated first and then added to the database.
@@ -266,30 +166,21 @@ namespace RadioPlayout.Controllers
 		/// <param name="audioType">The audio type id of the audio item. This will be converted to an integer.</param>
 		/// <returns>A Json object with '200' if the audio item was successfully added.</returns>
 		[HttpPost]
-		public ActionResult AddNewAudioItem(string artistName, string audioTitle, string audioFile, string audioDuration,
-			string audioIn, string audioOut, string audioReleaseYear, string audioType)
+		[ValidateAntiForgeryToken]
+		public async Task<ActionResult> AddNewAudioItem(AudioFormViewModel model)
 		{
-			errorDict.Clear();
+			// Placeholder for errors
+			var errors = new List<string>();
 
-			// Remove special characters from audioFile
-			audioFile = RemoveSpecialCharacters(audioFile);
-
-			// Placeholders for the audio upload paths
-			string uploadPath = uploadAudioDirectory + audioFile;
-			string audioPath = audioDirectory + audioFile;
-
-			// Dictionary to hold key value error pairs
-			ValidateAudioItems(artistName, audioTitle, audioFile, uploadPath, audioPath, audioDuration, audioIn, audioOut, audioReleaseYear, audioType);
-
-			if (errorDict.Count > 0)
+			if (ModelState.IsValid)
 			{
-				// The validation brought up errors. Do NOT add the audio item
-				Response.StatusCode = (int)HttpStatusCode.BadRequest;
-				return Json(errorDict);
-			}
-			else
-			{
-				// No errors were produced. The audio can be added
+				// Remove special characters from audioFile
+				string audioFile = RemoveSpecialCharacters(model.AudioLocation);
+
+				// Placeholders for the audio upload paths
+				string uploadPath = uploadAudioDirectory + audioFile;
+				string audioPath = audioDirectory + audioFile;
+
 				// Move the file from Content/Audio/Upload to Content/Audio
 				if (System.IO.File.Exists(audioPath) && System.IO.File.Exists(uploadPath))
 				{
@@ -298,17 +189,18 @@ namespace RadioPlayout.Controllers
 					// Move the new file into the audio directory
 					System.IO.File.Move(uploadPath, audioPath);
 				}
-				else if(!System.IO.File.Exists(audioPath) && System.IO.File.Exists(uploadPath))
+				else if (!System.IO.File.Exists(audioPath) && System.IO.File.Exists(uploadPath))
 				{
 					// Move the file from the upload directory to the audio directory
 					System.IO.File.Move(uploadPath, audioPath);
 				}
 				else
 				{
-					// When the user is adding a new audio file this part of the code should next run.
+					// When the user is adding a new audio file this part of the code should never run.
 					// This would only run if the audio is present in /Content/Audio but not in the /Content/Audio/Upload directory
+					errors.Add("There was an error with the file upload. Please try again.");
 					Response.StatusCode = (int)HttpStatusCode.BadRequest;
-					errorDict.Add("Audio", "There wasn an error with the file upload. Please try again");
+					return Json(new { status = "error", errors = errors });
 				}
 
 				// Remove all the files in the Upload directory
@@ -318,19 +210,31 @@ namespace RadioPlayout.Controllers
 					file.Delete();
 				}
 
+				// Convert the inputted time stamps to seconds and return an error if they can't be converted.
+				int audioIn = CalculateSeconds(model.AudioIn);
+				int audioOut = CalculateSeconds(model.AudioOut);
+				int audioDuration = CalculateSeconds(model.AudioDuration);
+
+				if (audioIn == -1 || audioOut == -1 || audioDuration == -1)
+				{
+					errors.Add("There was an error with the file upload. Please try again.");
+					Response.StatusCode = (int)HttpStatusCode.BadRequest;
+					return Json(new { status = "error", errors = errors });
+				}
+
 				// Get the audio type id
-				int audioTypeInt = Int32.Parse(audioType);
+				int audioTypeInt = model.AudioType;
 				AudioType audioTypeRef = _db.AudioType.Where(r => r.AudioTypeId.Equals(audioTypeInt)).First();
 
 				Audio newAudio = new Audio
 				{
-					ArtistName = artistName,
-					AudioTitle = audioTitle,
+					ArtistName = model.ArtistName,
+					AudioTitle = model.AudioTitle,
 					AudioLocation = audioFile,
-					AudioDuration = Int32.Parse(audioDuration),
-					AudioIn = Int32.Parse(audioIn),
-					AudioOut = Int32.Parse(audioOut),
-					AudioReleaseYear = Int32.Parse(audioReleaseYear),
+					AudioDuration = audioDuration,
+					AudioIn = audioIn,
+					AudioOut = audioOut,
+					AudioReleaseYear = model.AudioReleaseYear,
 					AudioType = audioTypeRef
 				};
 
@@ -340,6 +244,14 @@ namespace RadioPlayout.Controllers
 				Response.StatusCode = (int)HttpStatusCode.OK;
 				return Json("Success");
 			}
+
+			// If it gets this far an error has occured
+			foreach (var modelStateVal in ViewData.ModelState.Values)
+			{
+				errors.AddRange(modelStateVal.Errors.Select(error => error.ErrorMessage));
+			}
+			Response.StatusCode = (int)HttpStatusCode.BadRequest;
+			return Json(new { status = "error", errors = errors });
 		}
 
 		/// <summary>
@@ -356,41 +268,33 @@ namespace RadioPlayout.Controllers
 		/// <param name="audioType">The new audio type id for the audio item.</param>
 		/// <returns></returns>
 		[HttpPost]
-		public ActionResult UpdateAudioItem(string audioId, string artistName, string audioTitle, string audioFile, string audioDuration,
-			string audioIn, string audioOut, string audioReleaseYear, string audioType)
+		public ActionResult UpdateAudioItem(AudioFormViewModel model)
 		{
-			errorDict.Clear();
+			// Placeholder for errors
+			var errors = new List<string>();
 
-			// Remove special characters from the file input
-			audioFile = RemoveSpecialCharacters(audioFile);
-
-			// Placeholders for the audio upload paths
-			string uploadPath = uploadAudioDirectory + audioFile;
-			string audioPath = audioDirectory + audioFile;
-
-			// Dictionary to hold key value error pairs
-			ValidateAudioItems(artistName, audioTitle, audioFile, uploadPath, audioPath, audioDuration, audioIn, audioOut, audioReleaseYear, audioType);
-
-			// Check whether the audioID exists
-			// Placeholder for the audioIDInt
-			int audioIdInt = 0;
-			if (String.IsNullOrWhiteSpace(audioId))
+			if (ModelState.IsValid)
 			{
-				errorDict.Add("AudioItem", "There was an error updating this audio item. Please try again.");
-			}
-			else if(!Int32.TryParse(audioId, out audioIdInt))
-			{
-				errorDict.Add("AudioItem", "There was an error updating this audio item. Please try again");
-			}
+				// Remove special characters from the file input
+				string audioFile = RemoveSpecialCharacters(model.AudioLocation);
 
-			if (errorDict.Count > 0)
-			{
-				// The validation brought up errors. Do NOT Update the audio item
-				Response.StatusCode = (int)HttpStatusCode.BadRequest;
-				return Json(errorDict);
-			}
-			else
-			{
+				// Placeholders for the audio upload paths
+				string uploadPath = uploadAudioDirectory + audioFile;
+				string audioPath = audioDirectory + audioFile;
+
+				// Check whether the audioID exists
+				// Placeholder for the audioIDInt
+
+				int audioIdInt = 0;
+				if (String.IsNullOrWhiteSpace(model.AudioId.ToString()))
+				{
+					errorDict.Add("AudioItem", "There was an error updating this audio item. Please try again.");
+				}
+				else if (!Int32.TryParse(model.AudioId.ToString(), out audioIdInt))
+				{
+					errorDict.Add("AudioItem", "There was an error updating this audio item. Please try again");
+				}
+
 				// Move the file from /Content/Audio/Upload to Content/Audio
 				if (System.IO.File.Exists(uploadPath))
 				{
@@ -409,19 +313,30 @@ namespace RadioPlayout.Controllers
 				}
 
 				// Get the audio type id
-				int audioTypeIdInt = Int32.Parse(audioType);
-				AudioType audioTypeRef = _db.AudioType.Where(r => r.AudioTypeId.Equals(audioTypeIdInt)).First();
+				AudioType audioTypeRef = _db.AudioType.Where(r => r.AudioTypeId.Equals(model.AudioType)).First();
+
+				// Convert the inputted time stamps to seconds and return an error if they can't be converted.
+				int audioIn = CalculateSeconds(model.AudioIn);
+				int audioOut = CalculateSeconds(model.AudioOut);
+				int audioDuration = CalculateSeconds(model.AudioDuration);
+
+				if (audioIn == -1 || audioOut == -1 || audioDuration == -1)
+				{
+					errors.Add("There was an error with the file upload. Please try again.");
+					Response.StatusCode = (int)HttpStatusCode.BadRequest;
+					return Json(new { status = "error", errors = errors });
+				}
 
 				var audioItems = _db.Audio.Where(r => r.AudioId.Equals(audioIdInt));
-				foreach(Audio audioItem in audioItems)
+				foreach (Audio audioItem in audioItems)
 				{
-					audioItem.ArtistName = artistName;
-					audioItem.AudioTitle = audioTitle;
+					audioItem.ArtistName = model.ArtistName;
+					audioItem.AudioTitle = model.AudioTitle;
 					audioItem.AudioLocation = audioFile;
-					audioItem.AudioDuration = Int32.Parse(audioDuration);
-					audioItem.AudioIn = Int32.Parse(audioIn);
-					audioItem.AudioOut = Int32.Parse(audioOut);
-					audioItem.AudioReleaseYear = Int32.Parse(audioReleaseYear);
+					audioItem.AudioDuration = audioDuration;
+					audioItem.AudioIn = audioIn;
+					audioItem.AudioOut = audioOut;
+					audioItem.AudioReleaseYear = model.AudioReleaseYear;
 					audioItem.AudioType.AudioTypeId = audioTypeRef.AudioTypeId;
 				}
 				_db.SaveChanges();
@@ -429,6 +344,14 @@ namespace RadioPlayout.Controllers
 				Response.StatusCode = (int)HttpStatusCode.OK;
 				return Json("Success");
 			}
+
+			// If it gets this far an error has occured
+			foreach (var modelStateVal in ViewData.ModelState.Values)
+			{
+				errors.AddRange(modelStateVal.Errors.Select(error => error.ErrorMessage));
+			}
+			Response.StatusCode = (int)HttpStatusCode.BadRequest;
+			return Json(new { status = "error", errors = errors });
 		}
 
 		/// <summary>
@@ -520,6 +443,66 @@ namespace RadioPlayout.Controllers
 		public string RemoveSpecialCharacters(string inputString)
 		{
 			return Regex.Replace(inputString, "[^a-zA-Z0-9_.]+", "", RegexOptions.Compiled); ;
+		}
+
+		/// <summary>
+		/// Convert a time format such as "hh:mm:ss" or "mm:ss" into seconds
+		/// </summary>
+		/// <param name="formattedTime">The time format to convert.</param>
+		/// <returns>Returns a converted time format in seconds. If -1 is returned an error occured.</returns>
+		private int CalculateSeconds(string formattedTime)
+		{
+			string[] splitTime = formattedTime.Split(':');
+
+			// Check splitTime has two or three splits
+			if (splitTime.Count() == 2)
+			{
+				int minutes;
+				int seconds;
+
+				// Validate inputs
+				if (!Int32.TryParse(splitTime[0], out minutes))
+				{
+					return -1;
+				}
+				else if (!Int32.TryParse(splitTime[1], out seconds))
+				{
+					return -1;
+				}
+
+
+				int minutesToSeconds = minutes * 60;
+
+				return minutes + seconds;
+			}
+			else if (splitTime.Count() == 3)
+			{
+				int hours;
+				int minutes;
+				int seconds;
+
+				if(!Int32.TryParse(splitTime[0], out hours))
+				{
+					return -1;
+				}
+				else if(!Int32.TryParse(splitTime[1], out minutes))
+				{
+					return -1;
+				}
+				else if (!Int32.TryParse(splitTime[2], out seconds))
+				{
+					return -1;
+				}
+
+				int hourstoSeconds = hours * 3600;
+				int minutestoSeconds = minutes * 60;
+
+				return hourstoSeconds + minutestoSeconds + seconds;
+			}
+			else
+			{
+				return -1;
+			}
 		}
 	}
 }

@@ -13,10 +13,12 @@
 
 @section scripts
 {
+	<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
 	<script src="https://unpkg.com/wavesurfer.js"></script>
 	<script src="~/Scripts/Custom/audio_items.js"></script>
 }
 
+@Html.Partial("~/Views/Audio/_AddAudioItemModal.cshtml")
 @Html.Partial("~/Views/Audio/_EditAudioItemModal.cshtml")
 
 <div class="container-fluid">

@@ -1,0 +1,59 @@
+﻿<script>	
+	function OnSuccess() {
+		let audioSuccess = $(".audio_modal_success");
+		let audioErrorList = $(".audio_modal_error");
+
+		audioErrorList.empty();
+
+		audioSuccess.empty().append("The audio item was added to your catalogue.");
+	}
+
+	function OnError(value) {
+		let audioSuccess = $(".audio_modal_success");
+		let audioErrorList = $(".audio_modal_error");
+
+		let errors = $.parseJSON(value.responseText).errors
+
+		audioSuccess.empty();
+		audioErrorList.empty();
+		$.each(errors, function (index, value) {
+			audioErrorList.append("<li>" + value + "</li>");
+		});
+	}
+</script>
+
+<!-- Add AudioItem Modal -->
+<div class="modal fade" id="add_audio_items_modal" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Add new audio item</h5>
+			</div>
+			@using (Ajax.BeginForm("AddNewAudioItem", "Audio", new AjaxOptions { OnSuccess = "OnSuccess", OnFailure = "OnError"}, new { id = "audio_item_modal" }))
+			{
+			<div class="modal-body">
+				@Html.Partial("~/Views/Audio/_AudioForm.cshtml", new RadioPlayout.Models.AudioFormViewModel())
+				<div class="form-row">
+					<div class="col-12">
+						<div id="add_waveform"></div>
+					</div>
+				</div>
+			</div>
+				<div class="modal-footer">
+					<div class="col-2 d-flex justify-content-start">
+						<i class="fas fa-pause pointer" id="add_audio_modal_pause"></i>
+						<i class="fas fa-play ml-2 pointer" id="add_audio_modal_play"></i>
+					</div>
+					<div class="col-6">
+						<ul class="text-danger pr-1 list-unstyled audio_modal_error"></ul>
+						<div class="text-success pr-1 audio_modal_success"></div>
+					</div>
+					<div class="col-4 d-flex justify-content-end">
+						<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+						<input type="submit" class="btn btn-dark ml-1" value="Add Audio">
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+</div>
