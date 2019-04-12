@@ -290,7 +290,6 @@ const radioPlayout = {
         $(s.radioPlayer1AudioRef).on("loadeddata", function () {
             s.radioPlayer1Locked = true;
 
-            s.radioPlayer1AudioRef.volume = 0.75;
             s.radioPlayer1SongDuration = s.radioPlayer1AudioRef.duration;
             $("#radio_player_1_artist_name").text(trackData.ArtistName);
             $("#radio_player_1_song_title").text(trackData.AudioTitle);
@@ -321,13 +320,12 @@ const radioPlayout = {
         });
 
         // Set the audio track source
-        s.radioPlayer1AudioRef.setAttribute('src', "Content/Audio/" + trackData.AudioLocation);
+        s.radioPlayer1AudioRef.setAttribute("src", "Content/Audio/" + trackData.AudioLocation);
     },
     loadPlayer2Track: function (trackData) {
         // When the track has loaded
         $(s.radioPlayer2AudioRef).on("loadeddata", function () {
             s.radioPlayer2Locked = true;
-            s.radioPlayer2AudioRef.volume = 0.75;
             s.radioPlayer2SongDuration = s.radioPlayer2AudioRef.duration;
             $("#radio_player_2_artist_name").text(trackData.ArtistName);
             $("#radio_player_2_song_title").text(trackData.AudioTitle);
@@ -389,6 +387,9 @@ const radioPlayout = {
     clickSongDuration: function (songDurationBar, clickEvent, playerSong, audioRef) {
         let x = clickEvent.offsetX;
         let width = songDurationBar.width();
+
+        console.log(x);
+        console.log(width);
 
         // Find the percentage of the bar clicked
         let percentage = (x / width) * 100;
