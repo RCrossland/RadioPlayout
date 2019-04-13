@@ -170,7 +170,7 @@ namespace RadioPlayout.Controllers
 		public async Task<ActionResult> AddNewAudioItem(AudioFormViewModel model)
 		{
 			// Placeholder for errors
-			var errors = new List<string>();
+			List<string> errors = new List<string>();
 
 			if (ModelState.IsValid)
 			{

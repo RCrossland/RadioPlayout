@@ -211,5 +211,43 @@ namespace RadioPlayout.Controllers
 			
 			return Json(scheduleAudioItems);
 		}
+
+		[HttpPost]
+		public ActionResult DeleteScheduleClock(string scheduleClockId)
+		{
+			// Placeholder for any errors
+			List<string> errors = new List<String>();
+
+			// Placeholder for schedule id
+			int scheduleIdInt;
+			if(!Int32.TryParse(scheduleClockId, out scheduleIdInt))
+			{
+				errors.Add("There was an error deleting the schedule item. Please refresh and try again.");
+				Response.StatusCode = (int)HttpStatusCode.BadRequest;
+				return Json(new { status = "error", errors = errors });
+			}
+			else
+			{
+				// Find and remove the schedule items
+				var scheduleClockItems = _db.ScheduleClockItems.Where(m => m.ScheduleClock.ScheduleClockId.Equals(scheduleIdInt));
+				foreach(var scheduleClockItem in scheduleClockItems)
+				{
+					_db.ScheduleClockItems.Remove(scheduleClockItem);
+				}
+				_db.SaveChanges();
+
+				// Find and remove the schedule clock
+				var scheduleClocks = _db.ScheduleClock.Where(m => m.ScheduleClockId.Equals(scheduleIdInt));
+				foreach(var scheduleClock in scheduleClocks)
+				{
+					_db.ScheduleClock.Remove(scheduleClock);
+				}
+				_db.SaveChanges();
+
+				// Return state code 200
+				Response.StatusCode = (int)HttpStatusCode.OK;
+				return Json("Success");
+			}	
+		}
 	}
 }

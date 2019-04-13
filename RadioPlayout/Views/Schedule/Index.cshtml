@@ -17,7 +17,7 @@
 					<div class="card h-100">
 						<div class="card-header bg-dark text-white">Clock Information</div>
 						<div class="card-body pl-4 pr-4 pt-2">
-							<form method="post" id="schedule_clock_form" data-submit="@Url.Action("SubmitScheduleClock")">
+							<form method="post" id="schedule_clock_form" data-submit="@Url.Action("SubmitScheduleClock")" data-remove="@Url.Action("DeleteScheduleClock")">
 								<div class="form-group">
 									<label for="schedule_clock_name">Clock Name</label>
 									<input type="text" class="form-control" id="schedule_clock_name" name="schedule_clock_name" />
@@ -39,8 +39,10 @@
 					<div class="card h-100">
 						<div class="card-header bg-dark text-white">Current Clocks</div>
 						<div class="card-body pl-4 pr-4 pt-2">
-							<ul class="list-group list-group-flush" id="current_schedule_clocks" data-url="@Url.Action("GetExistingScheduleClocks")">
-							</ul>
+							<ul class="list-group list-group-flush" id="current_schedule_clocks" data-url="@Url.Action("GetExistingScheduleClocks")"></ul>
+
+							<div class="text-success" id="current_schedule_clock_success"></div>
+							<div class="text-danger" id="current_schedule_clock_error"></div>
 						</div>
 					</div>
 				</div>

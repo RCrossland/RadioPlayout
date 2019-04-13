@@ -268,7 +268,13 @@
             let scheduleClockHTML = "";
 
             $.each(scheduleClocks, function (index, value) {
-                scheduleClockHTML = scheduleClockHTML + "<li class=\"list-group-item pointer no_select existing_schedule_clock\">" + value.ScheduleClockName + "</li>";
+                scheduleClockHTML = scheduleClockHTML +
+                    "<li class=\"list-group-item no_select\">" +
+                        "<div class=\"row\">" + 
+                            "<div class=\"col-8 pointer existing_schedule_clock\">" + value.ScheduleClockName + "</div>" +
+                            "<div class=\"col-4 pointer text-center remove_schedule_clock\" data-id=" + value.ScheduleClockId + "><i class=\"fas fa-times\"></i></div>" +
+                        "</div>" +
+                    "</li > ";
             });
 
             // Append the HTML to the page and attach a click event handler
@@ -277,6 +283,12 @@
                 e.stopImmediatePropagation();
 
                 scheduleClock.getSpecifiedScheduleClock($(this).text());
+            });
+
+            $(".remove_schedule_clock").click(function (e) {
+                e.stopImmediatePropagation();
+
+                scheduleClock.removeSpecifiedScheduleClock($(this));
             });
         }
     },
@@ -289,9 +301,25 @@
                 scheduleClock.populateScheduleClock(scheduleClockName, scheduleClockItems);
             },
             error: function (jqXHR, textStatus, errorThrown){
-                console.log(jqXHR.responseText);
             }
         });
+    },
+    removeSpecifiedScheduleClock: function (scheduleClock) {
+        $.ajax({
+            type: "POST",
+            url: $("#schedule_clock_form").data("remove"),
+            data: {
+                scheduleClockId: scheduleClock.data("id")
+            },
+            success: function () {
+                $("#current_schedule_clock_success").empty().append("Schedule clock was successfully deleted.");
+                $("#current_schedule_clock_error").empty();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $("#current_schedule_clock_success").empty();
+                $("#current_schedule_clock_error").empty().append(jqXHR.responseText);
+            }
+        })
     },
     populateScheduleClock: function (scheduleClockName, scheduleClockItems) {
         let scheduleClockItemsHTML = "";

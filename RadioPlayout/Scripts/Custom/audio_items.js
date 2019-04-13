@@ -121,20 +121,6 @@ let editAudioItems = {
             editAudioItems.settings.editWaveSurfer.pause();
         });
 
-        $("#audio_item_form").on('submit', function (e) {
-            e.preventDefault();
-            // TODO: Change this back to validate the audio form
-            if (editAudioItems.validateAudioForm(s.audioModalType)) {
-                // Form is valid and can submit
-                if (s.audioModalType == "addAudioItem") {
-                    editAudioItems.addNewAudioItemSubmit();
-                }
-                else {
-                    editAudioItems.editAudioItemSubmit();
-                }
-            }
-        });
-
         s.audioFile.on('change', function () {
             // Create a FormData object in order to store the file data
             let formData = new FormData();
@@ -262,66 +248,6 @@ let editAudioItems = {
 
         s.audioOutRef.val(date.toISOString().substr(11, 8));
     },
-    validateAudioForm: function () {
-        if (editAudioItems.validateArtistName() && editAudioItems.validateAudioTitle() &&
-            editAudioItems.validateAudioType() && editAudioItems.validateReleaseYears() &&
-            editAudioItems.validateAudioLocation() && editAudioItems.validateAudioIn() &&
-            editAudioItems.validateAudioOut() && editAudioItems.validateAudioDuration()) {
-            // Form can submit
-            return true;
-        }
-        else {
-            // Form cannot submit
-            return false;
-        }
-    },
-    addNewAudioItemSubmit: function () {
-        $.ajax({
-            url: $("#audio_item_form").data("add-url"),
-            type: "POST",
-            data: {
-                "artistName": s.artistNameRef.val(),
-                "audioTitle": s.audioTitleRef.val(),
-                "audioFile": s.audioFileRef.val().split('\\').pop(), // Split the file path just to get the filename
-                "audioDuration": editAudioItems.getSeconds(s.audioDurationRef.val()),
-                "audioIn": editAudioItems.getSeconds(s.audioInRef.val()),
-                "audioOut": editAudioItems.getSeconds(s.audioOutRef.val()),
-                "audioReleaseYear": s.audioReleaseYearRef.val(),
-                "audioType": s.audioTypeRef.val()
-            },
-            success: function () {
-                $("#audio_modal_success").text("The audio item was successfully added");
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                let response = jqXHR.responseJSON;
-                editAudioItems.displayValidation(response);
-            }
-        });
-    },
-    editAudioItemSubmit: function () {
-        $.ajax({
-            url: $("#audio_item_form").data("update-url"),
-            type: "POST",
-            data: {
-                "audioId": $("#audio_item_form").attr("data-audio-id"),
-                "artistName": s.artistNameRef.val(),
-                "audioTitle": s.audioTitleRef.val(),
-                "audioFile": s.audioFileRef.data("file-name"),
-                "audioDuration": editAudioItems.getSeconds(s.audioDurationRef.val()),
-                "audioIn": editAudioItems.getSeconds(s.audioInRef.val()),
-                "audioOut": editAudioItems.getSeconds(s.audioOutRef.val()),
-                "audioReleaseYear": s.audioReleaseYearRef.val(),
-                "audioType": s.audioTypeRef.val()
-            },
-            success: function () {
-                $("#audio_modal_success").text("The audio item was successfully updated.");
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                let response = jqXHR.responseJSON;
-                editAudioItems.displayValidation(response);
-            }
-        });
-    },
     deleteAudioItem: function (audioId) {
         // Validate audioId has a value
         if (audioId == "" || audioId == null) {
@@ -342,9 +268,6 @@ let editAudioItems = {
                 }
             })
         }
-    },
-    stripInput: function (input) {
-        // Strip the user input of any harmful inputs
     },
     displayValidation: function (ajaxResponse) {
         if (ajaxResponse.hasOwnProperty("ArtistName")) {
